@@ -278,7 +278,7 @@
             }
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             
-            PSPDFDocument *document = [PSPDFDocument PDFDocumentWithURL:url];
+            PSPDFDocument *document = [PSPDFDocument PDFDocumentWithUrl:url];
             document.title = text;
 
             PSPDFViewController *detailViewController = [[PSPDFViewController alloc] initWithDocument:document];
