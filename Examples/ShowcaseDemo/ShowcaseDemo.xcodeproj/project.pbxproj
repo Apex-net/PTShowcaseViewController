@@ -835,9 +835,6 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../Libraries/PSPDFKit\"",
-					"\"$(SRCROOT)/../../Libraries/PSPDFKit/Examples/PSPDFCatalog/Vendor/GSDropboxActivity\"",
-					"\"$(SRCROOT)/../../Libraries/PSPDFKit/Examples/PSPDFCatalog/Vendor/HockeySDK.embeddedframework\"",
 					"\"$(SRCROOT)/../../Libraries/PSPDFKit/PSPDFKit.embeddedframework\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -855,9 +852,6 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../Libraries/PSPDFKit\"",
-					"\"$(SRCROOT)/../../Libraries/PSPDFKit/Examples/PSPDFCatalog/Vendor/GSDropboxActivity\"",
-					"\"$(SRCROOT)/../../Libraries/PSPDFKit/Examples/PSPDFCatalog/Vendor/HockeySDK.embeddedframework\"",
 					"\"$(SRCROOT)/../../Libraries/PSPDFKit/PSPDFKit.embeddedframework\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
