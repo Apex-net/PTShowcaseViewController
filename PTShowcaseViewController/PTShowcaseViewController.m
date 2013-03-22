@@ -206,6 +206,7 @@
             detailViewController.showcaseView.showcaseDataSource = self.showcaseView.showcaseDataSource;
             
             detailViewController.excludedActivityTypes = self.excludedActivityTypes;
+            detailViewController.maxSharingFileSize = self.maxSharingFileSize;
             
             detailViewController.title = text;
             detailViewController.view.backgroundColor = self.view.backgroundColor;
@@ -406,8 +407,11 @@
         return;
     }
     
-    PTContentType contentType = [self.showcaseView contentTypeForItemAtIndex:self.selectedItemPosition];
-    NSMutableArray *items = nil;
+    PTContentType contentType = [self.showcaseView contentTypeForItemAtIndex:self.selectedItemPosition];    
+    NSString *text = nil;
+    NSString *url = nil;
+    
+    NSMutableArray *excludedActivities = [self.excludedActivityTypes mutableCopy];
     
     switch (contentType)
     {
@@ -422,30 +426,41 @@
             NSInteger relativeIndex = [self.showcaseView relativeIndexForItemAtIndex:self.selectedItemPosition withContentType:contentType];
             
             // Only text and image
-            NSString *path = [self.showcaseView sourceForThumbnailImageOfItemAtIndex:relativeIndex];
-            UIImage *image = [UIImage imageWithContentsOfFile:path];
-            NSString *text = [self.showcaseView detailTextForItemAtIndex:relativeIndex] != nil
+            NSString *path = [self.showcaseView pathForItemAtIndex:relativeIndex];
+            
+            // check max filesize
+            if ([self fileSizeExceededMaxFileSize:path]) {
+                return;
+            }
+            
+            // TODO remove duplicate
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>            
+            // Check for file URLs.
+            if ([path hasPrefix:@"/"]) {
+                // If the url starts with / then it's likely a file URL, so treat it accordingly.
+                url = [NSURL fileURLWithPath:path];
+            }
+            else {
+                // Otherwise we assume it's a regular URL.
+                url = [NSURL URLWithString:path];
+            }
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            
+            text = [self.showcaseView detailTextForItemAtIndex:relativeIndex] != nil
             ? [self.showcaseView detailTextForItemAtIndex:relativeIndex]
             : [NSString string];
             
             NSLog(@"Image: %@ url: %@", text, path);
-            
-            items = [NSMutableArray new];
-            [items addObject:text];
-            [items addObject:image];
-            
             break;
         }
             
         case PTContentTypeVideo:
         {
             NSString *path = [self.showcaseView pathForItemAtIndex:self.selectedItemPosition];
-            NSString *text = [self.showcaseView textForItemAtIndex:self.selectedItemPosition];
+            text = [self.showcaseView textForItemAtIndex:self.selectedItemPosition];
             
             // TODO remove duplicate
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            NSURL *url = nil;
-            
             // Check for file URLs.
             if ([path hasPrefix:@"/"]) {
                 // If the url starts with / then it's likely a file URL, so treat it accordingly.
@@ -457,24 +472,25 @@
             }
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+            // check max filesize
+            if ([self fileSizeExceededMaxFileSize:path]) {
+                return;
+            }
+            
+            // exclude facebook and twitter share
+            [excludedActivities addObjectsFromArray:@[ UIActivityTypePostToFacebook, UIActivityTypePostToTwitter]];
+            
             NSLog(@"Video: %@ url: %@", text, url);
-            
-            items = [[NSMutableArray alloc] init];
-            [items addObject:text];
-            [items addObject:url];
-            
             break;
         }
             
         case PTContentTypePdf:
         {
             NSString *path = [self.showcaseView pathForItemAtIndex:self.selectedItemPosition];
-            NSString *text = [self.showcaseView textForItemAtIndex:self.selectedItemPosition];
+            text = [self.showcaseView textForItemAtIndex:self.selectedItemPosition];
             
             // TODO remove duplicate
-            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            NSURL *url = nil;
-            
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>            
             // Check for file URLs.
             if ([path hasPrefix:@"/"]) {
                 // If the url starts with / then it's likely a file URL, so treat it accordingly.
@@ -486,42 +502,46 @@
             }
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             
+            // check max filesize
+            if ([self fileSizeExceededMaxFileSize:path]) {
+                return;
+            }
+            
+            // exclude facebook and twitter share
+            [excludedActivities addObjectsFromArray:@[ UIActivityTypePostToFacebook, UIActivityTypePostToTwitter]];
+            
             NSLog(@"PDF: %@ url: %@", text, url);
-            
-            items = [[NSMutableArray alloc] init];
-            [items addObject:text];
-            [items addObject:url];
-            
             break;
         }
             
         default: NSAssert(NO, @"Unknown content-type.");
     }
     
-    if (items != nil) {
-        UIActivityViewControllerCompletionHandler completitionHandler = ^(NSString *activityType, BOOL completed) {
-            NSLog(@"Completed dialog - activity: %@ - finished flag: %d", activityType, completed);
-            self.activityPopoverController = nil;
-        };
-        
-        UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:self.applicationActivities];
-        activityViewController.excludedActivityTypes = self.excludedActivityTypes;
-        activityViewController.completionHandler = completitionHandler;
-        
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-            [[self topViewController:self] presentViewController:activityViewController animated:YES completion:NULL];
-        }
-        else {
-            self.activityPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityViewController];
-            self.activityPopoverController.delegate = self;
-            [self.activityPopoverController presentPopoverFromBarButtonItem:self.actionBarButtonItem
-                                                   permittedArrowDirections:UIPopoverArrowDirectionUp
-                                                                   animated:YES];
-        }
+    NSArray *items = @[ text, url ];
+    
+    UIActivityViewControllerCompletionHandler completitionHandler = ^(NSString *activityType, BOOL completed) {
+        NSLog(@"Completed dialog - activity: %@ - finished flag: %d", activityType, completed);
+        self.activityPopoverController = nil;
+    };
+    
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:self.applicationActivities];
+    activityViewController.excludedActivityTypes = excludedActivities;
+    activityViewController.completionHandler = completitionHandler;
+    
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        [[self topViewController:self] presentViewController:activityViewController animated:YES completion:NULL];
     }
+    else {
+        self.activityPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityViewController];
+        self.activityPopoverController.delegate = self;
+        [self.activityPopoverController presentPopoverFromBarButtonItem:self.actionBarButtonItem
+                                               permittedArrowDirections:UIPopoverArrowDirectionUp
+                                                               animated:YES];
+    }
+
 }
 
-#pragma mark - Private utility method
+#pragma mark - Private methods
 
 - (UIViewController *)topViewController:(UIViewController *)rootViewController
 {
@@ -537,6 +557,51 @@
     
     UIViewController *presentedViewController = (UIViewController *)rootViewController.presentedViewController;
     return [self topViewController:presentedViewController];
+}
+
+- (BOOL)fileSizeExceededMaxFileSize:(NSString *)path
+{
+    // get file's size in bytes
+    NSError *attributesError = nil;
+    NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&attributesError];
+    
+    if (!attributesError) {
+        NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
+        long long fileSize = [fileSizeNumber longLongValue];
+        NSLog(@"Size: %lld max: %lld", fileSize, self.maxSharingFileSize.longLongValue);
+        
+        if (fileSize > self.maxSharingFileSize.longLongValue) {
+            NSLog(@"File size exceded.");
+            
+            NSString *size = [NSString stringWithFormat:@"%lld Mb", (self.maxSharingFileSize.longLongValue / (1024*1024))];
+            NSString *message = NSLocalizedString(@"Il file eccede la dimensione massima consentita per la condivisione", nil);
+            message = [NSString stringWithFormat:@"%@ (%@).", message, size];
+                
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Attenzione", nil)
+                                                            message:message
+                                                            delegate:nil
+                                                    cancelButtonTitle:NSLocalizedString(@"Ok", nil)
+                                                otherButtonTitles:nil, nil];
+            [alert show];
+            
+            return YES;
+        }
+    }
+    else {
+        // if get some errors, alert
+        NSLog(@"Couldn't get file attributes.");
+        NSString *message = NSLocalizedString(@"Errore generico.", nil);        
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Attenzione", nil)
+                                                        message:message
+                                                        delegate:nil
+                                                cancelButtonTitle:NSLocalizedString(@"Ok", nil)
+                                              otherButtonTitles:nil, nil];
+        [alert show];
+        
+        return YES;
+    }
+    
+    return NO;
 }
 
 @end
