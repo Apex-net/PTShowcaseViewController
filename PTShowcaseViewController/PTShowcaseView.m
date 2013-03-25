@@ -416,6 +416,41 @@ typedef enum {
     return relativeIndex;
 }
 
+- (BOOL)fileExceededMaxFileSize:(NSString *)path
+{
+    // get file's size in bytes
+    NSError *attributesError = nil;
+    NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&attributesError];
+    
+    if (!attributesError) {
+        NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
+        long long fileSize = [fileSizeNumber longLongValue];
+        NSLog(@"Size: %@ max: %@", fileSizeNumber.stringValue, self.maxSharingFileSize.stringValue);
+        
+        if (fileSize > self.maxSharingFileSize.longLongValue) {
+            NSLog(@"File size exceded.");
+                        
+            if ([self.showcaseDelegate respondsToSelector:@selector(showcaseView:fileWithPath:exceededMaxFileSizeWithSize:errors:)]) {
+                [self.showcaseDelegate showcaseView:self fileWithPath:path exceededMaxFileSizeWithSize:fileSizeNumber errors:NULL];
+            }
+            
+            return YES;
+        }
+    }
+    else {
+        // if get some errors, alert
+        NSLog(@"Couldn't get file attributes.");
+        
+        if ([self.showcaseDelegate respondsToSelector:@selector(showcaseView:fileWithPath:exceededMaxFileSizeWithSize:errors:)]) {
+            [self.showcaseDelegate showcaseView:self fileWithPath:path exceededMaxFileSizeWithSize:nil errors:&attributesError];
+        }
+        
+        return YES;
+    }
+    
+    return NO;
+}
+
 - (void)reloadData
 {
     self.cachedData = nil;

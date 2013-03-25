@@ -26,11 +26,12 @@
 
 @end
 
-@interface PTShowcaseViewController () <GMGridViewActionDelegate, PTImageAlbumViewDataSource, UIPopoverControllerDelegate>
+@interface PTShowcaseViewController () <GMGridViewActionDelegate, PTImageAlbumViewDataSource, PTImageAlbumViewDelegate, UIPopoverControllerDelegate>
 
 @property (strong, nonatomic) UIPopoverController *activityPopoverController;
 @property (strong, nonatomic) UIBarButtonItem *actionBarButtonItem;
 @property (assign, nonatomic) NSInteger selectedItemPosition;
+@property (assign, nonatomic) NSInteger selectedNestedItemPosition;
 
 - (void)dismissImageDetailViewController;
 
@@ -122,6 +123,10 @@
     // Internal
     self.showcaseView.dataSource = self.showcaseView; // this will trigger 'reloadData' automatically
     self.showcaseView.actionDelegate = self;
+    
+    self.selectedItemPosition = 0;
+    self.selectedNestedItemPosition = 0;
+    self.showcaseView.maxSharingFileSize = self.maxSharingFileSize;
 }
 
 - (void)viewDidUnload
@@ -155,6 +160,14 @@
         [self setView:nil];
         [self viewDidUnload];
     }
+}
+
+#pragma mark - Setter
+
+- (void)setMaxSharingFileSize:(NSNumber *)maxSharingFileSize
+{
+    _maxSharingFileSize = maxSharingFileSize;
+    self.showcaseView.maxSharingFileSize = maxSharingFileSize;
 }
 
 #pragma mark - Rotation
@@ -224,7 +237,10 @@
             
             PTImageAlbumViewController *detailViewController = [[PTImageAlbumViewController alloc] initWithImageAtIndex:relativeIndex];
             detailViewController.imageAlbumView.imageAlbumDataSource = self;
+            detailViewController.imageAlbumView.imageAlbumDelegate = self;
             detailViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+            
+            self.selectedNestedItemPosition = relativeIndex;
             
             UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:detailViewController];
             
@@ -376,6 +392,12 @@
     abort();
 }
 
+#pragma mark - PTImageAlbumViewDelegate
+- (void)imageAlbumView:(PTImageAlbumView *)imageAlbumView didChangeImageAtIndex:(NSInteger)index
+{
+    self.selectedNestedItemPosition = index;
+}
+
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 #pragma mark - Movie Player utility
@@ -422,14 +444,13 @@
         }
             
         case PTContentTypeImage:
-        {
-            NSInteger relativeIndex = [self.showcaseView relativeIndexForItemAtIndex:self.selectedItemPosition withContentType:contentType];
-            
+        {            
             // Only text and image
-            NSString *path = [self.showcaseView pathForItemAtIndex:relativeIndex];
+            NSInteger absoluteIndex = [self.showcaseView indexForItemAtRelativeIndex:self.selectedNestedItemPosition withContentType:PTContentTypeImage];
+            NSString *path = [self.showcaseView pathForItemAtIndex:absoluteIndex];
             
             // check max filesize
-            if ([self fileSizeExceededMaxFileSize:path]) {
+            if ([self.showcaseView fileExceededMaxFileSize:path]) {
                 return;
             }
             
@@ -446,8 +467,8 @@
             }
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             
-            text = [self.showcaseView detailTextForItemAtIndex:relativeIndex] != nil
-            ? [self.showcaseView detailTextForItemAtIndex:relativeIndex]
+            text = [self.showcaseView detailTextForItemAtIndex:absoluteIndex] != nil
+            ? [self.showcaseView detailTextForItemAtIndex:absoluteIndex]
             : [NSString string];
             
             NSLog(@"Image: %@ url: %@", text, path);
@@ -473,7 +494,7 @@
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
             // check max filesize
-            if ([self fileSizeExceededMaxFileSize:path]) {
+            if ([self.showcaseView fileExceededMaxFileSize:path]) {
                 return;
             }
             
@@ -503,7 +524,7 @@
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             
             // check max filesize
-            if ([self fileSizeExceededMaxFileSize:path]) {
+            if ([self.showcaseView fileExceededMaxFileSize:path]) {
                 return;
             }
             
@@ -557,51 +578,6 @@
     
     UIViewController *presentedViewController = (UIViewController *)rootViewController.presentedViewController;
     return [self topViewController:presentedViewController];
-}
-
-- (BOOL)fileSizeExceededMaxFileSize:(NSString *)path
-{
-    // get file's size in bytes
-    NSError *attributesError = nil;
-    NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&attributesError];
-    
-    if (!attributesError) {
-        NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
-        long long fileSize = [fileSizeNumber longLongValue];
-        NSLog(@"Size: %lld max: %lld", fileSize, self.maxSharingFileSize.longLongValue);
-        
-        if (fileSize > self.maxSharingFileSize.longLongValue) {
-            NSLog(@"File size exceded.");
-            
-            NSString *size = [NSString stringWithFormat:@"%lld Mb", (self.maxSharingFileSize.longLongValue / (1024*1024))];
-            NSString *message = NSLocalizedString(@"Il file eccede la dimensione massima consentita per la condivisione", nil);
-            message = [NSString stringWithFormat:@"%@ (%@).", message, size];
-                
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Attenzione", nil)
-                                                            message:message
-                                                            delegate:nil
-                                                    cancelButtonTitle:NSLocalizedString(@"Ok", nil)
-                                                otherButtonTitles:nil, nil];
-            [alert show];
-            
-            return YES;
-        }
-    }
-    else {
-        // if get some errors, alert
-        NSLog(@"Couldn't get file attributes.");
-        NSString *message = NSLocalizedString(@"Errore generico.", nil);        
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Attenzione", nil)
-                                                        message:message
-                                                        delegate:nil
-                                                cancelButtonTitle:NSLocalizedString(@"Ok", nil)
-                                              otherButtonTitles:nil, nil];
-        [alert show];
-        
-        return YES;
-    }
-    
-    return NO;
 }
 
 @end

@@ -26,7 +26,7 @@
 @property (assign, nonatomic) BOOL activityButtonEnabled;
 @property (strong, nonatomic) NSArray *excludedActivityTypes;
 @property (strong, nonatomic) NSArray *applicationActivities;
-@property (strong, nonatomic) NSNumber *maxSharingFileSize;
+@property (strong, nonatomic, setter = setMaxSharingFileSize:) NSNumber *maxSharingFileSize;
 
 - (id)initWithUniqueName:(NSString *)uniqueName;
 
