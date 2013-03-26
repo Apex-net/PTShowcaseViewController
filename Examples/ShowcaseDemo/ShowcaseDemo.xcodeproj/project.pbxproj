@@ -82,7 +82,12 @@
 		50FC0D2414E3D44300F28648 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 50FC0D2214E3D44300F28648 /* InfoPlist.strings */; };
 		50FC0D2614E3D44300F28648 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 50FC0D2514E3D44300F28648 /* main.m */; };
 		50FC0D2A14E3D44300F28648 /* PTAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 50FC0D2914E3D44300F28648 /* PTAppDelegate.m */; };
-		578233AF16EA212900A8819B /* PSPDFKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 578233AE16EA212900A8819B /* PSPDFKit.framework */; };
+		57A270CD16FB510E00B05CF9 /* PSPDFKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57A2701216FB510E00B05CF9 /* PSPDFKit.framework */; };
+		57A270CE16FB510E00B05CF9 /* ACKNOWLEDGEMENTS in Resources */ = {isa = PBXBuildFile; fileRef = 57A2701416FB510E00B05CF9 /* ACKNOWLEDGEMENTS */; };
+		57A270CF16FB510E00B05CF9 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 57A2701516FB510E00B05CF9 /* LICENSE */; };
+		57A270D016FB510E00B05CF9 /* PSPDFKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 57A2701616FB510E00B05CF9 /* PSPDFKit.bundle */; };
+		57A270D116FB510E00B05CF9 /* PSPDFKit.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 57A2701716FB510E00B05CF9 /* PSPDFKit.xcconfig */; };
+		57A270D216FB510E00B05CF9 /* VERSION in Resources */ = {isa = PBXBuildFile; fileRef = 57A2701816FB510E00B05CF9 /* VERSION */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -249,7 +254,12 @@
 		50FC0D2714E3D44300F28648 /* ShowcaseDemo-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ShowcaseDemo-Prefix.pch"; sourceTree = "<group>"; };
 		50FC0D2814E3D44300F28648 /* PTAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PTAppDelegate.h; sourceTree = "<group>"; };
 		50FC0D2914E3D44300F28648 /* PTAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PTAppDelegate.m; sourceTree = "<group>"; };
-		578233AE16EA212900A8819B /* PSPDFKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PSPDFKit.framework; path = ../../Libraries/PSPDFKit/PSPDFKit.framework; sourceTree = "<group>"; };
+		57A2701216FB510E00B05CF9 /* PSPDFKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PSPDFKit.framework; sourceTree = "<group>"; };
+		57A2701416FB510E00B05CF9 /* ACKNOWLEDGEMENTS */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ACKNOWLEDGEMENTS; sourceTree = "<group>"; };
+		57A2701516FB510E00B05CF9 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		57A2701616FB510E00B05CF9 /* PSPDFKit.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = PSPDFKit.bundle; sourceTree = "<group>"; };
+		57A2701716FB510E00B05CF9 /* PSPDFKit.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = PSPDFKit.xcconfig; sourceTree = "<group>"; };
+		57A2701816FB510E00B05CF9 /* VERSION */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VERSION; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -268,7 +278,7 @@
 				50FC0D1A14E3D44300F28648 /* UIKit.framework in Frameworks */,
 				50FC0D1C14E3D44300F28648 /* Foundation.framework in Frameworks */,
 				50FC0D1E14E3D44300F28648 /* CoreGraphics.framework in Frameworks */,
-				578233AF16EA212900A8819B /* PSPDFKit.framework in Frameworks */,
+				57A270CD16FB510E00B05CF9 /* PSPDFKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,6 +417,7 @@
 		5093F21314E51E07004DC805 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				57A26EDF16FB510D00B05CF9 /* PSPDFKit */,
 				50A6019014F536C9002076AB /* GMGridView */,
 				50B977B914EC10EB00873F87 /* Nimbus */,
 				505AE96014ED785700BBFC05 /* PTImageAlbumViewController */,
@@ -549,7 +560,6 @@
 		50FC0D1814E3D44300F28648 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				578233AE16EA212900A8819B /* PSPDFKit.framework */,
 				5088D9D61521EC3E00A1A9DE /* AVFoundation.framework */,
 				5088D9D41521EC3100A1A9DE /* CoreMedia.framework */,
 				5088D9D21521EC2B00A1A9DE /* ImageIO.framework */,
@@ -591,6 +601,36 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		57A26EDF16FB510D00B05CF9 /* PSPDFKit */ = {
+			isa = PBXGroup;
+			children = (
+				57A2701116FB510E00B05CF9 /* PSPDFKit.embeddedframework */,
+			);
+			name = PSPDFKit;
+			path = ../../Libraries/PSPDFKit;
+			sourceTree = "<group>";
+		};
+		57A2701116FB510E00B05CF9 /* PSPDFKit.embeddedframework */ = {
+			isa = PBXGroup;
+			children = (
+				57A2701216FB510E00B05CF9 /* PSPDFKit.framework */,
+				57A2701316FB510E00B05CF9 /* Resources */,
+			);
+			path = PSPDFKit.embeddedframework;
+			sourceTree = "<group>";
+		};
+		57A2701316FB510E00B05CF9 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				57A2701416FB510E00B05CF9 /* ACKNOWLEDGEMENTS */,
+				57A2701516FB510E00B05CF9 /* LICENSE */,
+				57A2701616FB510E00B05CF9 /* PSPDFKit.bundle */,
+				57A2701716FB510E00B05CF9 /* PSPDFKit.xcconfig */,
+				57A2701816FB510E00B05CF9 /* VERSION */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -626,6 +666,8 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				de,
+				fr,
 			);
 			mainGroup = 50FC0D0A14E3D44300F28648;
 			productRefGroup = 50FC0D1614E3D44300F28648 /* Products */;
@@ -648,6 +690,11 @@
 				50A2F63614F63EE0009EE464 /* ShowcaseDemo.plist in Resources */,
 				5058396D1590C44F007C9675 /* NimbusPhotos.bundle in Resources */,
 				5058398D1590C490007C9675 /* NimbusOverviewer.bundle in Resources */,
+				57A270CE16FB510E00B05CF9 /* ACKNOWLEDGEMENTS in Resources */,
+				57A270CF16FB510E00B05CF9 /* LICENSE in Resources */,
+				57A270D016FB510E00B05CF9 /* PSPDFKit.bundle in Resources */,
+				57A270D116FB510E00B05CF9 /* PSPDFKit.xcconfig in Resources */,
+				57A270D216FB510E00B05CF9 /* VERSION in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -788,7 +835,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../Libraries/PSPDFKit\"",
+					"\"$(SRCROOT)/../../Libraries/PSPDFKit/PSPDFKit.embeddedframework\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ShowcaseDemo/ShowcaseDemo-Prefix.pch";
@@ -805,7 +852,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../Libraries/PSPDFKit\"",
+					"\"$(SRCROOT)/../../Libraries/PSPDFKit/PSPDFKit.embeddedframework\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ShowcaseDemo/ShowcaseDemo-Prefix.pch";

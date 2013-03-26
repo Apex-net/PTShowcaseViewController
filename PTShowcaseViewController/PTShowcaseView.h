@@ -40,6 +40,7 @@ typedef enum {
 
 - (void)showcaseView:(PTShowcaseView *)showcaseView didPrepareReusableThumbnailView:(UIView *)view forContentType:(PTContentType)contentType andOrientation:(PTItemOrientation)orientation;
 - (void)showcaseView:(PTShowcaseView *)showcaseView willDisplayThumbnailView:(UIView *)view forItemAtIndex:(NSInteger)index;
+- (void)showcaseView:(PTShowcaseView *)showcaseView fileWithPath:(NSString *)path exceededMaxFileSizeWithSize:(NSNumber *)fileSize errors:(NSError **)error;
 
 @end
 
@@ -73,6 +74,8 @@ typedef enum {
 
 @property (retain, nonatomic, readonly) NSArray *imageItems;
 
+@property (strong, nonatomic) NSNumber *maxSharingFileSize;
+
 - (id)initWithUniqueName:(NSString *)uniqueName;
 
 - (NSInteger)numberOfItems;
@@ -91,6 +94,8 @@ typedef enum {
 
 - (NSInteger)indexForItemAtRelativeIndex:(NSInteger)relativeIndex withContentType:(PTContentType)contentType;
 - (NSInteger)relativeIndexForItemAtIndex:(NSInteger)index withContentType:(PTContentType)contentType;
+
+- (BOOL)fileExceededMaxFileSize:(NSString *)path;
 
 - (void)reloadData;
 

@@ -26,7 +26,12 @@
 
 @end
 
-@interface PTShowcaseViewController () <GMGridViewActionDelegate, PTImageAlbumViewDataSource>
+@interface PTShowcaseViewController () <GMGridViewActionDelegate, PTImageAlbumViewDataSource, PTImageAlbumViewDelegate, UIPopoverControllerDelegate>
+
+@property (strong, nonatomic) UIPopoverController *activityPopoverController;
+@property (strong, nonatomic) UIBarButtonItem *actionBarButtonItem;
+@property (assign, nonatomic) NSInteger selectedItemPosition;
+@property (assign, nonatomic) NSInteger selectedNestedItemPosition;
 
 - (void)dismissImageDetailViewController;
 
@@ -57,12 +62,14 @@
 - (id)init
 {
     return [self initWithUniqueName:nil];
+    
+    // share option disabled by default
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     NSAssert(nibBundleOrNil == nil, @"Initializing showcase view controller with the nib file is not supported yet!");
-
+    
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.hidesBottomBarInDetails = NO;
@@ -92,33 +99,40 @@
     else {
         self.view = self.showcaseView;
     }
+    
+    self.activityButtonEnabled = YES;
+    
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+    
     if (self.showcaseView == nil) {
         self.showcaseView = (PTShowcaseView *)self.view;
     }
-
+    
     if (self.showcaseView.showcaseDelegate == nil) {
         self.showcaseView.showcaseDelegate = self;
     }
-
+    
     if (self.showcaseView.showcaseDataSource == nil) {
         self.showcaseView.showcaseDataSource = self;
     }
-
+    
     // Internal
     self.showcaseView.dataSource = self.showcaseView; // this will trigger 'reloadData' automatically
     self.showcaseView.actionDelegate = self;
+    
+    self.selectedItemPosition = 0;
+    self.selectedNestedItemPosition = 0;
+    self.showcaseView.maxSharingFileSize = self.maxSharingFileSize;
 }
 
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-
+    
     self.showcaseView = nil;
 }
 
@@ -130,7 +144,7 @@
  * that are associated with your view hierarchy, including objects loaded from
  * the nib file, objects created in your viewDidLoad method, and objects created
  * lazily at runtime and added to the view hierarchy.
-
+ 
  * On iOS 6, views are never purged and these methods are never called. If a
  * view controller needs to perform specific tasks when memory is low, it should
  * override the didReceiveMemoryWarning method.
@@ -140,12 +154,20 @@
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-
+    
     if ([self isViewLoaded] && [self.view window] == nil) {
         [self viewWillUnload];
         [self setView:nil];
         [self viewDidUnload];
     }
+}
+
+#pragma mark - Setter
+
+- (void)setMaxSharingFileSize:(NSNumber *)maxSharingFileSize
+{
+    _maxSharingFileSize = maxSharingFileSize;
+    self.showcaseView.maxSharingFileSize = maxSharingFileSize;
 }
 
 #pragma mark - Rotation
@@ -154,7 +176,7 @@
 {
     // Phone: any orientation except upside down
     // Pad  : any orientation is just fine
-
+    
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         return interfaceOrientation =! UIInterfaceOrientationPortraitUpsideDown;
     }
@@ -174,7 +196,7 @@
     NSInteger relativeIndex = imageAlbumViewController.photoAlbumView.centerPageIndex;
     NSInteger index = [self.showcaseView indexForItemAtRelativeIndex:relativeIndex withContentType:PTContentTypeImage];
     [self.showcaseView scrollToObjectAtIndex:index atScrollPosition:GMGridViewScrollPositionTop animated:NO];
-
+    
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
@@ -182,24 +204,28 @@
 
 - (void)GMGridView:(GMGridView *)gridView didTapOnItemAtIndex:(NSInteger)position
 {
+    self.selectedItemPosition = position;
     PTContentType contentType = [self.showcaseView contentTypeForItemAtIndex:position];
-
+    
     switch (contentType)
     {
         case PTContentTypeGroup:
         {
             NSString *uniqueName = [self.showcaseView uniqueNameForItemAtIndex:position];
             NSString *text = [self.showcaseView textForItemAtIndex:position];
-
+            
             PTGroupDetailViewController *detailViewController = [[PTGroupDetailViewController alloc] initWithUniqueName:uniqueName];
             detailViewController.showcaseView.showcaseDelegate = self.showcaseView.showcaseDelegate;
             detailViewController.showcaseView.showcaseDataSource = self.showcaseView.showcaseDataSource;
             
+            detailViewController.excludedActivityTypes = self.excludedActivityTypes;
+            detailViewController.maxSharingFileSize = self.maxSharingFileSize;
+            
             detailViewController.title = text;
             detailViewController.view.backgroundColor = self.view.backgroundColor;
-
+            
             detailViewController.hidesBottomBarWhenPushed = self.hidesBottomBarInDetails;
-
+            
             [self.navigationController pushViewController:detailViewController animated:YES];
             
             break;
@@ -208,18 +234,25 @@
         case PTContentTypeImage:
         {
             NSInteger relativeIndex = [self.showcaseView relativeIndexForItemAtIndex:position withContentType:contentType];
-
+            
             PTImageAlbumViewController *detailViewController = [[PTImageAlbumViewController alloc] initWithImageAtIndex:relativeIndex];
             detailViewController.imageAlbumView.imageAlbumDataSource = self;
-
+            detailViewController.imageAlbumView.imageAlbumDelegate = self;
             detailViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-
-            [detailViewController.navigationItem setLeftBarButtonItem:
-             [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-                                                           target:self
-                                                           action:@selector(dismissImageDetailViewController)]];
+            
+            self.selectedNestedItemPosition = relativeIndex;
             
             UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:detailViewController];
+            
+            // button to close the image album
+            UIBarButtonItem *dismissButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissDetailViewController)];
+            detailViewController.navigationItem.leftBarButtonItem = dismissButton;
+            
+            // button to share video
+            if (self.activityButtonEnabled) {
+                self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
+                detailViewController.navigationItem.rightBarButtonItem = self.actionBarButtonItem;
+            }
             
             // TODO zoom in/out (just like in Photos.app in the iPad)
             [self presentViewController:navCtrl animated:YES completion:NULL];
@@ -231,11 +264,11 @@
         {
             NSString *path = [self.showcaseView pathForItemAtIndex:position];
             NSString *text = [self.showcaseView textForItemAtIndex:position];
-
+            
             // TODO remove duplicate
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             NSURL *url = nil;
-
+            
             // Check for file URLs.
             if ([path hasPrefix:@"/"]) {
                 // If the url starts with / then it's likely a file URL, so treat it accordingly.
@@ -246,14 +279,26 @@
                 url = [NSURL URLWithString:path];
             }
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
+            
             MPMoviePlayerViewController *detailViewController = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
             detailViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-
+            detailViewController.moviePlayer.controlStyle = MPMovieControlStyleDefault;
             detailViewController.title = text;
-
+            
+            UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:detailViewController];
+            
+            // button to close the movie player
+            UIBarButtonItem *dismissButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissDetailViewController)];
+            detailViewController.navigationItem.leftBarButtonItem = dismissButton;
+            
+            // button to share video
+            if (self.activityButtonEnabled) {
+                self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
+                detailViewController.navigationItem.rightBarButtonItem = self.actionBarButtonItem;
+            }
+            
             // TODO zoom in/out (just like in Photos.app in the iPad)
-            [self presentMoviePlayerViewControllerAnimated:detailViewController];
+            [self presentViewController:navCtrl animated:YES completion:NULL];
             
             break;
         }
@@ -262,7 +307,7 @@
         {
             NSString *path = [self.showcaseView pathForItemAtIndex:position];
             NSString *text = [self.showcaseView textForItemAtIndex:position];
-
+            
             // TODO remove duplicate
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             NSURL *url = nil;
@@ -280,13 +325,18 @@
             
             PSPDFDocument *document = [PSPDFDocument PDFDocumentWithUrl:url];
             document.title = text;
-
+            
             PSPDFViewController *detailViewController = [[PSPDFViewController alloc] initWithDocument:document];
             detailViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
             detailViewController.backgroundColor = self.view.backgroundColor;
             
+            if (self.activityButtonEnabled) {
+                self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
+                detailViewController.rightBarButtonItems = [NSArray arrayWithObjects:detailViewController.searchButtonItem, detailViewController.outlineButtonItem, detailViewController.viewModeButtonItem, self.actionBarButtonItem, nil];
+            }
+            
             UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:detailViewController];
-
+            
             // TODO zoom in/out (just like in Photos.app in the iPad)
             [self presentViewController:navCtrl animated:YES completion:NULL];
             
@@ -342,6 +392,192 @@
     abort();
 }
 
+#pragma mark - PTImageAlbumViewDelegate
+- (void)imageAlbumView:(PTImageAlbumView *)imageAlbumView didChangeImageAtIndex:(NSInteger)index
+{
+    self.selectedNestedItemPosition = index;
+}
+
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+#pragma mark - Movie Player utility
+
+- (void)dismissDetailViewController
+{
+    [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
+#pragma mark - UIPopoverController and WEPopoverController delegate
+
+- (void)popoverControllerDidDismissPopover:(NSObject *)popoverController
+{
+    self.activityPopoverController = nil;
+}
+
+- (BOOL)popoverControllerShouldDismissPopover:(NSObject *)popoverController
+{
+    return YES;
+}
+
+#pragma mark - Share utility
+- (void)shareButtonItemTapped
+{
+    // prevent crash when tapping on bar button item and popover is already on screen
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad && self.activityPopoverController != nil) {
+        [self.activityPopoverController dismissPopoverAnimated:YES];
+        self.activityPopoverController = nil;
+        return;
+    }
+    
+    PTContentType contentType = [self.showcaseView contentTypeForItemAtIndex:self.selectedItemPosition];    
+    NSString *text = nil;
+    NSString *url = nil;
+    
+    NSMutableArray *excludedActivities = [self.excludedActivityTypes mutableCopy];
+    
+    switch (contentType)
+    {
+        case PTContentTypeGroup:
+        {
+            // nothing to do
+            break;
+        }
+            
+        case PTContentTypeImage:
+        {            
+            // Only text and image
+            NSInteger absoluteIndex = [self.showcaseView indexForItemAtRelativeIndex:self.selectedNestedItemPosition withContentType:PTContentTypeImage];
+            NSString *path = [self.showcaseView pathForItemAtIndex:absoluteIndex];
+            
+            // check max filesize
+            if ([self.showcaseView fileExceededMaxFileSize:path]) {
+                return;
+            }
+            
+            // TODO remove duplicate
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>            
+            // Check for file URLs.
+            if ([path hasPrefix:@"/"]) {
+                // If the url starts with / then it's likely a file URL, so treat it accordingly.
+                url = [NSURL fileURLWithPath:path];
+            }
+            else {
+                // Otherwise we assume it's a regular URL.
+                url = [NSURL URLWithString:path];
+            }
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            
+            text = [self.showcaseView detailTextForItemAtIndex:absoluteIndex] != nil
+            ? [self.showcaseView detailTextForItemAtIndex:absoluteIndex]
+            : [NSString string];
+            
+            NSLog(@"Image: %@ url: %@", text, path);
+            break;
+        }
+            
+        case PTContentTypeVideo:
+        {
+            NSString *path = [self.showcaseView pathForItemAtIndex:self.selectedItemPosition];
+            text = [self.showcaseView textForItemAtIndex:self.selectedItemPosition];
+            
+            // TODO remove duplicate
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // Check for file URLs.
+            if ([path hasPrefix:@"/"]) {
+                // If the url starts with / then it's likely a file URL, so treat it accordingly.
+                url = [NSURL fileURLWithPath:path];
+            }
+            else {
+                // Otherwise we assume it's a regular URL.
+                url = [NSURL URLWithString:path];
+            }
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            // check max filesize
+            if ([self.showcaseView fileExceededMaxFileSize:path]) {
+                return;
+            }
+            
+            // exclude facebook and twitter share
+            [excludedActivities addObjectsFromArray:@[ UIActivityTypePostToFacebook, UIActivityTypePostToTwitter]];
+            
+            NSLog(@"Video: %@ url: %@", text, url);
+            break;
+        }
+            
+        case PTContentTypePdf:
+        {
+            NSString *path = [self.showcaseView pathForItemAtIndex:self.selectedItemPosition];
+            text = [self.showcaseView textForItemAtIndex:self.selectedItemPosition];
+            
+            // TODO remove duplicate
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>            
+            // Check for file URLs.
+            if ([path hasPrefix:@"/"]) {
+                // If the url starts with / then it's likely a file URL, so treat it accordingly.
+                url = [NSURL fileURLWithPath:path];
+            }
+            else {
+                // Otherwise we assume it's a regular URL.
+                url = [NSURL URLWithString:path];
+            }
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            
+            // check max filesize
+            if ([self.showcaseView fileExceededMaxFileSize:path]) {
+                return;
+            }
+            
+            // exclude facebook and twitter share
+            [excludedActivities addObjectsFromArray:@[ UIActivityTypePostToFacebook, UIActivityTypePostToTwitter]];
+            
+            NSLog(@"PDF: %@ url: %@", text, url);
+            break;
+        }
+            
+        default: NSAssert(NO, @"Unknown content-type.");
+    }
+    
+    NSArray *items = @[ text, url ];
+    
+    UIActivityViewControllerCompletionHandler completitionHandler = ^(NSString *activityType, BOOL completed) {
+        NSLog(@"Completed dialog - activity: %@ - finished flag: %d", activityType, completed);
+        self.activityPopoverController = nil;
+    };
+    
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:self.applicationActivities];
+    activityViewController.excludedActivityTypes = excludedActivities;
+    activityViewController.completionHandler = completitionHandler;
+    
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        [[self topViewController:self] presentViewController:activityViewController animated:YES completion:NULL];
+    }
+    else {
+        self.activityPopoverController = [[UIPopoverController alloc] initWithContentViewController:activityViewController];
+        self.activityPopoverController.delegate = self;
+        [self.activityPopoverController presentPopoverFromBarButtonItem:self.actionBarButtonItem
+                                               permittedArrowDirections:UIPopoverArrowDirectionUp
+                                                               animated:YES];
+    }
+
+}
+
+#pragma mark - Private methods
+
+- (UIViewController *)topViewController:(UIViewController *)rootViewController
+{
+    if (rootViewController.presentedViewController == nil) {
+        return rootViewController;
+    }
+    
+    if ([rootViewController.presentedViewController isMemberOfClass:[UINavigationController class]]) {
+        UINavigationController *navigationController = (UINavigationController *)rootViewController.presentedViewController;
+        UIViewController *lastViewController = [[navigationController viewControllers] lastObject];
+        return [self topViewController:lastViewController];
+    }
+    
+    UIViewController *presentedViewController = (UIViewController *)rootViewController.presentedViewController;
+    return [self topViewController:presentedViewController];
+}
 
 @end

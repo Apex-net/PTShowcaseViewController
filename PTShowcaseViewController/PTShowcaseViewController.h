@@ -23,6 +23,11 @@
 @property (retain, nonatomic) PTShowcaseView *showcaseView;
 @property (assign, nonatomic) BOOL hidesBottomBarInDetails;
 
+@property (assign, nonatomic) BOOL activityButtonEnabled;
+@property (strong, nonatomic) NSArray *excludedActivityTypes;
+@property (strong, nonatomic) NSArray *applicationActivities;
+@property (strong, nonatomic, setter = setMaxSharingFileSize:) NSNumber *maxSharingFileSize;
+
 - (id)initWithUniqueName:(NSString *)uniqueName;
 
 @end
