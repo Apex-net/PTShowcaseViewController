@@ -335,7 +335,9 @@ typedef enum {
             thumbnailImageSize = [NSValue valueWithCGSize:CGSizeZero];
         }
 
-        [[self.cachedData objectAtIndex:index] setObject:thumbnailImageSize forKey:@"thumbnailImageSize"];
+        if (thumbnailImageSize) {
+            [[self.cachedData objectAtIndex:index] setObject:thumbnailImageSize forKey:@"thumbnailImageSize"];
+        }
     }
 
     return [thumbnailImageSize CGSizeValue];
@@ -774,8 +776,6 @@ typedef enum {
     GMGridViewCell *cell = [self GMGridView:gridView reusableCellForContentType:contentType withOrientation:orientation];
 
     NINetworkImageView *thumbnailView = (NINetworkImageView *)[cell.contentView viewWithTag:PTShowcaseTagThumbnail];
-    [thumbnailView setPathToNetworkImage:thumbnailImageSource];
-
     thumbnailView.contentMode = UIViewContentModeScaleAspectFill;
     if (!CGSizeEqualToSize(size, CGSizeZero)) {
         NSArray *minSize = self.itemUIProperties[contentType][[[UIDevice currentDevice] userInterfaceIdiom]][orientation];
@@ -783,6 +783,7 @@ typedef enum {
             thumbnailView.contentMode = UIViewContentModeScaleAspectFit;
         }
     }
+    [thumbnailView setPathToNetworkImage:thumbnailImageSource];
 
     UILabel *textLabel = (UILabel *)[cell.contentView viewWithTag:PTShowcaseTagText];
     textLabel.text = text;
