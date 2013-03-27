@@ -804,21 +804,29 @@ typedef enum {
     PTContentType contentType = [self contentTypeForItemAtIndex:index];
     PTItemOrientation orientation = [self orientationForItemAtIndex:index];
     NSString *thumbnailImageSource = [self sourceForThumbnailImageOfItemAtIndex:index];
+
     CGSize size = [self sizeForThumbnailImageOfItemAtIndex:index];
     NSString *text = [self textForItemAtIndex:index];
     NSString *detailText = [self detailTextForItemAtIndex:index];
-
+    
     GMGridViewCell *cell = [self GMGridView:gridView reusableCellForContentType:contentType withOrientation:orientation];
-
     NINetworkImageView *thumbnailView = (NINetworkImageView *)[cell.contentView viewWithTag:PTShowcaseTagThumbnail];
     thumbnailView.contentMode = UIViewContentModeScaleAspectFill;
-    if (!CGSizeEqualToSize(size, CGSizeZero)) {
-        NSArray *minSize = self.itemUIProperties[contentType][[[UIDevice currentDevice] userInterfaceIdiom]][orientation];
-        if (size.width < [minSize[0] floatValue] || size.height < [minSize[1] floatValue]) {
-            thumbnailView.contentMode = UIViewContentModeScaleAspectFit;
+    
+    if (thumbnailImageSource != nil) {
+
+        if (!CGSizeEqualToSize(size, CGSizeZero)) {
+            NSArray *minSize = self.itemUIProperties[contentType][[[UIDevice currentDevice] userInterfaceIdiom]][orientation];
+            if (size.width < [minSize[0] floatValue] || size.height < [minSize[1] floatValue]) {
+                thumbnailView.contentMode = UIViewContentModeScaleAspectFit;
+            }
         }
+        
+        [thumbnailView setPathToNetworkImage:thumbnailImageSource];
     }
-    [thumbnailView setPathToNetworkImage:thumbnailImageSource];
+    else {
+        thumbnailView.image = thumbnailView.initialImage;
+    }
 
     UILabel *textLabel = (UILabel *)[cell.contentView viewWithTag:PTShowcaseTagText];
     textLabel.text = text;
