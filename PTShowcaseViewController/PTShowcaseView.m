@@ -358,8 +358,7 @@ typedef enum {
     id path = [[self.cachedData objectAtIndex:index] objectForKey:@"path"];
     if (path == nil) {
         path = [self.showcaseDataSource showcaseView:self pathForItemAtIndex:index];
-        NSLog(@"Path: %@", path);
-        NSAssert((path==nil) || [path hasPrefix:@"/"], @"path should be a valid non-relative (absolute) system path.");
+        NSAssert((path == nil) || [path hasPrefix:@"/"], @"path should be a valid non-relative (absolute) system path.");
         [[self.cachedData objectAtIndex:index] setObject:(path ? path : [NSNull null]) forKey:@"path"];
     }
     return path == [NSNull null] ? nil : path;
