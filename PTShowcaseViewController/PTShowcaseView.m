@@ -812,6 +812,7 @@ typedef enum {
     GMGridViewCell *cell = [self GMGridView:gridView reusableCellForContentType:contentType withOrientation:orientation];
     NINetworkImageView *thumbnailView = (NINetworkImageView *)[cell.contentView viewWithTag:PTShowcaseTagThumbnail];
     thumbnailView.contentMode = UIViewContentModeScaleAspectFill;
+    thumbnailView.image = thumbnailView.initialImage;
     
     if (thumbnailImageSource != nil) {
 
@@ -821,11 +822,7 @@ typedef enum {
                 thumbnailView.contentMode = UIViewContentModeScaleAspectFit;
             }
         }
-        
         [thumbnailView setPathToNetworkImage:thumbnailImageSource];
-    }
-    else {
-        thumbnailView.image = thumbnailView.initialImage;
     }
 
     UILabel *textLabel = (UILabel *)[cell.contentView viewWithTag:PTShowcaseTagText];
