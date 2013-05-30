@@ -73,6 +73,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         self.hidesBottomBarInDetails = NO;
+        self.activityButtonEnabled = YES;
     }
     return self;
 }
@@ -99,9 +100,6 @@
     else {
         self.view = self.showcaseView;
     }
-    
-    self.activityButtonEnabled = YES;
-    
 }
 
 - (void)viewDidLoad
@@ -218,6 +216,7 @@
             detailViewController.showcaseView.showcaseDelegate = self.showcaseView.showcaseDelegate;
             detailViewController.showcaseView.showcaseDataSource = self.showcaseView.showcaseDataSource;
             
+            detailViewController.activityButtonEnabled = self.activityButtonEnabled;
             detailViewController.excludedActivityTypes = self.excludedActivityTypes;
             detailViewController.maxSharingFileSize = self.maxSharingFileSize;
             
