@@ -244,7 +244,7 @@
             UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:detailViewController];
             
             // button to close the image album
-            UIBarButtonItem *dismissButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissDetailViewController)];
+            UIBarButtonItem *dismissButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissImageDetailViewController)];
             detailViewController.navigationItem.leftBarButtonItem = dismissButton;
             
             // button to share video
