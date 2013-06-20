@@ -31,3 +31,10 @@
 - (id)initWithUniqueName:(NSString *)uniqueName;
 
 @end
+
+#pragma mark - Group detail
+
+@interface PTGroupDetailViewController : PTShowcaseViewController
+
+@end
+

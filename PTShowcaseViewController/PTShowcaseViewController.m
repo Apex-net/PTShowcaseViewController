@@ -39,10 +39,6 @@
 
 #pragma mark - Group detail
 
-@interface PTGroupDetailViewController : PTShowcaseViewController
-
-@end
-
 @implementation PTGroupDetailViewController
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
