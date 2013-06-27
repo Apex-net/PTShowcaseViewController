@@ -370,7 +370,7 @@
                 [barButtons addObjectsFromArray:buttons];
             }
             
-            detailViewController.navigationItem.rightBarButtonItems = barButtons;
+            detailViewController.rightBarButtonItems = barButtons;
             
             UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:detailViewController];
             
