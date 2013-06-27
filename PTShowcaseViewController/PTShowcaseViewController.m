@@ -221,6 +221,16 @@
             
             detailViewController.hidesBottomBarWhenPushed = self.hidesBottomBarInDetails;
             
+            NSMutableArray *barButtons = [[NSMutableArray alloc] init];
+            
+            // additional buttons
+            if ([self.showcaseView.showcaseDelegate respondsToSelector:@selector(showcaseView:barButtonItemsForItemAtIndex:)]) {
+                NSArray *buttons = [self.showcaseView.showcaseDelegate showcaseView:self.showcaseView barButtonItemsForItemAtIndex:position];
+                [barButtons addObjectsFromArray:buttons];
+            }
+            
+            detailViewController.navigationItem.rightBarButtonItems = barButtons;
+            
             [self.navigationController pushViewController:detailViewController animated:YES];
             
             break;
@@ -243,11 +253,21 @@
             UIBarButtonItem *dismissButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissImageDetailViewController)];
             detailViewController.navigationItem.leftBarButtonItem = dismissButton;
             
-            // button to share video
+            NSMutableArray *barButtons = [[NSMutableArray alloc] init];
+            
+            // button to share image
             if (self.activityButtonEnabled) {
                 self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
-                detailViewController.navigationItem.rightBarButtonItem = self.actionBarButtonItem;
+                [barButtons addObject:self.actionBarButtonItem];
             }
+            
+            // additional buttons
+            if ([self.showcaseView.showcaseDelegate respondsToSelector:@selector(showcaseView:barButtonItemsForItemAtIndex:)]) {
+                NSArray *buttons = [self.showcaseView.showcaseDelegate showcaseView:self.showcaseView barButtonItemsForItemAtIndex:position];
+                [barButtons addObjectsFromArray:buttons];
+            }
+                        
+            detailViewController.navigationItem.rightBarButtonItems = barButtons;
             
             // TODO zoom in/out (just like in Photos.app in the iPad)
             [self presentViewController:navCtrl animated:YES completion:NULL];
@@ -286,11 +306,21 @@
             UIBarButtonItem *dismissButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissDetailViewController)];
             detailViewController.navigationItem.leftBarButtonItem = dismissButton;
             
-            // button to share video
+            NSMutableArray *barButtons = [[NSMutableArray alloc] init];
+            
+            // button to share image
             if (self.activityButtonEnabled) {
                 self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
-                detailViewController.navigationItem.rightBarButtonItem = self.actionBarButtonItem;
+                [barButtons addObject:self.actionBarButtonItem];
             }
+            
+            // additional buttons
+            if ([self.showcaseView.showcaseDelegate respondsToSelector:@selector(showcaseView:barButtonItemsForItemAtIndex:)]) {
+                NSArray *buttons = [self.showcaseView.showcaseDelegate showcaseView:self.showcaseView barButtonItemsForItemAtIndex:position];
+                [barButtons addObjectsFromArray:buttons];
+            }
+            
+            detailViewController.navigationItem.rightBarButtonItems = barButtons;
             
             // TODO zoom in/out (just like in Photos.app in the iPad)
             [self presentViewController:navCtrl animated:YES completion:NULL];
@@ -325,10 +355,22 @@
             detailViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
             detailViewController.backgroundColor = self.view.backgroundColor;
             
+            // PSPDFKit buttons
+            NSMutableArray *barButtons = [[NSMutableArray alloc] initWithObjects: detailViewController.searchButtonItem, detailViewController.outlineButtonItem, detailViewController.viewModeButtonItem, nil];
+            
+            // button to share image
             if (self.activityButtonEnabled) {
                 self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
-                detailViewController.rightBarButtonItems = [NSArray arrayWithObjects:detailViewController.searchButtonItem, detailViewController.outlineButtonItem, detailViewController.viewModeButtonItem, self.actionBarButtonItem, nil];
+                [barButtons addObject:self.actionBarButtonItem];
             }
+            
+            // additional buttons
+            if ([self.showcaseView.showcaseDelegate respondsToSelector:@selector(showcaseView:barButtonItemsForItemAtIndex:)]) {
+                NSArray *buttons = [self.showcaseView.showcaseDelegate showcaseView:self.showcaseView barButtonItemsForItemAtIndex:position];
+                [barButtons addObjectsFromArray:buttons];
+            }
+            
+            detailViewController.navigationItem.rightBarButtonItems = barButtons;
             
             UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:detailViewController];
             
