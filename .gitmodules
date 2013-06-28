@@ -10,6 +10,3 @@
 [submodule "Libraries/SDURLCache"]
 	path = Libraries/SDURLCache
 	url = git://github.com/rs/SDURLCache.git
-[submodule "Libraries/PSPDFKit"]
-	path = Libraries/PSPDFKit
-	url = https://github.com/PSPDFKit/PSPDFKit-Demo.git
