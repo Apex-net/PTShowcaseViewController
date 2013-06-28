@@ -243,6 +243,7 @@
             PTImageAlbumViewController *detailViewController = [[PTImageAlbumViewController alloc] initWithImageAtIndex:relativeIndex];
             detailViewController.imageAlbumView.imageAlbumDataSource = self;
             detailViewController.imageAlbumView.imageAlbumDelegate = self;
+            detailViewController.view.backgroundColor = [UIColor blackColor];
             detailViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
             
             self.selectedNestedItemPosition = relativeIndex;
