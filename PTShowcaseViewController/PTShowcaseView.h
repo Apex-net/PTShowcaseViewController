@@ -17,6 +17,7 @@
 #import "GMGridView.h"
 
 @class PTShowcaseView;
+@class PTImageAlbumView;
 
 typedef enum {
     PTItemOrientationPortrait,
@@ -41,7 +42,6 @@ typedef enum {
 - (void)showcaseView:(PTShowcaseView *)showcaseView didPrepareReusableThumbnailView:(UIView *)view forContentType:(PTContentType)contentType andOrientation:(PTItemOrientation)orientation;
 - (void)showcaseView:(PTShowcaseView *)showcaseView willDisplayThumbnailView:(UIView *)view forItemAtIndex:(NSInteger)index;
 - (void)showcaseView:(PTShowcaseView *)showcaseView fileWithPath:(NSString *)path exceededMaxFileSizeWithSize:(NSNumber *)fileSize errors:(NSError **)error;
-- (NSArray *)showcaseView:(PTShowcaseView *)showcaseView barButtonItemsForItemAtIndex:(NSInteger)index;
 
 @end
 
@@ -60,6 +60,7 @@ typedef enum {
 - (NSString *)showcaseView:(PTShowcaseView *)showcaseView sourceForThumbnailImageOfItemAtIndex:(NSInteger)index;
 - (NSString *)showcaseView:(PTShowcaseView *)showcaseView textForItemAtIndex:(NSInteger)index;
 - (NSString *)showcaseView:(PTShowcaseView *)showcaseView detailTextForItemAtIndex:(NSInteger)index;
+- (NSArray *)showcaseView:(PTShowcaseView *)showcaseView additionalBarButtonItemsForImageAlbum:(PTImageAlbumView *)imageAlbumView;
 
 @end
 

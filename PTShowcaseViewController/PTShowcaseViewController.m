@@ -17,6 +17,7 @@
 #import "PTShowcaseViewController.h"
 
 #import "PTImageAlbumViewController.h"
+#import "PTBarButtonItem.h"
 #import <MediaPlayer/MediaPlayer.h>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -32,6 +33,8 @@
 @property (strong, nonatomic) UIBarButtonItem *actionBarButtonItem;
 @property (assign, nonatomic) NSInteger selectedItemPosition;
 @property (assign, nonatomic) NSInteger selectedNestedItemPosition;
+
+@property (strong, nonatomic) NSArray *additionalBarButtonItems;
 
 - (void)dismissImageDetailViewController;
 
@@ -220,17 +223,7 @@
             detailViewController.view.backgroundColor = self.view.backgroundColor;
             
             detailViewController.hidesBottomBarWhenPushed = self.hidesBottomBarInDetails;
-            
-            NSMutableArray *barButtons = [[NSMutableArray alloc] init];
-            
-            // additional buttons
-            if ([self.showcaseView.showcaseDelegate respondsToSelector:@selector(showcaseView:barButtonItemsForItemAtIndex:)]) {
-                NSArray *buttons = [self.showcaseView.showcaseDelegate showcaseView:self.showcaseView barButtonItemsForItemAtIndex:position];
-                [barButtons addObjectsFromArray:buttons];
-            }
-            
-            detailViewController.navigationItem.rightBarButtonItems = barButtons;
-            
+                        
             [self.navigationController pushViewController:detailViewController animated:YES];
             
             break;
@@ -263,11 +256,18 @@
             }
             
             // additional buttons
-            if ([self.showcaseView.showcaseDelegate respondsToSelector:@selector(showcaseView:barButtonItemsForItemAtIndex:)]) {
-                NSArray *buttons = [self.showcaseView.showcaseDelegate showcaseView:self.showcaseView barButtonItemsForItemAtIndex:position];
-                [barButtons addObjectsFromArray:buttons];
+            if ([self.showcaseView.showcaseDataSource respondsToSelector:@selector(showcaseView:additionalBarButtonItemsForImageAlbum:)]) {
+                self.additionalBarButtonItems = [self.showcaseView.showcaseDataSource showcaseView:self.showcaseView additionalBarButtonItemsForImageAlbum:detailViewController.imageAlbumView];
+                
+                // check buttons class
+                [self validateBarButtonItems:self.additionalBarButtonItems];
+                
+                // force re-setting of bar button properties
+                [self imageAlbumView:detailViewController.imageAlbumView didChangeImageAtIndex:self.selectedNestedItemPosition];
+                
+                [barButtons addObjectsFromArray:self.additionalBarButtonItems];
             }
-                        
+                                    
             detailViewController.navigationItem.rightBarButtonItems = barButtons;
             
             // TODO zoom in/out (just like in Photos.app in the iPad)
@@ -314,13 +314,7 @@
                 self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
                 [barButtons addObject:self.actionBarButtonItem];
             }
-            
-            // additional buttons
-            if ([self.showcaseView.showcaseDelegate respondsToSelector:@selector(showcaseView:barButtonItemsForItemAtIndex:)]) {
-                NSArray *buttons = [self.showcaseView.showcaseDelegate showcaseView:self.showcaseView barButtonItemsForItemAtIndex:position];
-                [barButtons addObjectsFromArray:buttons];
-            }
-            
+                        
             detailViewController.navigationItem.rightBarButtonItems = barButtons;
             
             // TODO zoom in/out (just like in Photos.app in the iPad)
@@ -363,12 +357,6 @@
             if (self.activityButtonEnabled) {
                 self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
                 [barButtons addObject:self.actionBarButtonItem];
-            }
-            
-            // additional buttons
-            if ([self.showcaseView.showcaseDelegate respondsToSelector:@selector(showcaseView:barButtonItemsForItemAtIndex:)]) {
-                NSArray *buttons = [self.showcaseView.showcaseDelegate showcaseView:self.showcaseView barButtonItemsForItemAtIndex:position];
-                [barButtons addObjectsFromArray:buttons];
             }
             
             detailViewController.rightBarButtonItems = barButtons;
@@ -434,6 +422,14 @@
 - (void)imageAlbumView:(PTImageAlbumView *)imageAlbumView didChangeImageAtIndex:(NSInteger)index
 {
     self.selectedNestedItemPosition = index;
+    
+    for (UIBarButtonItem *item in self.additionalBarButtonItems) {        
+        if ([item isKindOfClass:[PTBarButtonItem class]]) {
+            PTBarButtonItem *button = (PTBarButtonItem *)item;
+            button.index = [self.showcaseView indexForItemAtRelativeIndex:self.selectedNestedItemPosition withContentType:PTContentTypeImage];
+            button.showcaseUniqueName = [self.showcaseView uniqueName];
+        }
+    }
 }
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -616,6 +612,22 @@
     
     UIViewController *presentedViewController = (UIViewController *)rootViewController.presentedViewController;
     return [self topViewController:presentedViewController];
+}
+
+- (void)validateBarButtonItems:(NSArray *)buttons
+{
+    // check if bar button are instance of PTBarButtonItem
+    __block BOOL found = NO;
+    [buttons enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if (![obj isKindOfClass:[PTBarButtonItem class]]) {
+            found = YES;
+            *stop = YES;
+        }
+    }];
+    
+    if (found) {
+        NSAssert(NO, @"Wrong bar button item class. Please use 'PTBarButtonItem' class to instatiate bar button items.");
+    }
 }
 
 @end
