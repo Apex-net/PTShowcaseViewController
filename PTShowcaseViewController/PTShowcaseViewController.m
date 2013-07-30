@@ -256,8 +256,8 @@
             }
             
             // additional buttons
-            if ([self.showcaseView.showcaseDataSource respondsToSelector:@selector(showcaseView:additionalBarButtonItemsForImageAlbum:)]) {
-                self.additionalBarButtonItems = [self.showcaseView.showcaseDataSource showcaseView:self.showcaseView additionalBarButtonItemsForImageAlbum:detailViewController.imageAlbumView];
+            if ([self.showcaseView.showcaseDataSource respondsToSelector:@selector(showcaseView:additionalBarButtonItemsForImageAlbumViewController:)]) {
+                self.additionalBarButtonItems = [self.showcaseView.showcaseDataSource showcaseView:self.showcaseView additionalBarButtonItemsForImageAlbumViewController:detailViewController];
                 
                 // check buttons class
                 [self validateBarButtonItems:self.additionalBarButtonItems];
