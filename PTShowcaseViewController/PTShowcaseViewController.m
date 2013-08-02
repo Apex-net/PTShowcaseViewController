@@ -419,6 +419,7 @@
 }
 
 #pragma mark - PTImageAlbumViewDelegate
+
 - (void)imageAlbumView:(PTImageAlbumView *)imageAlbumView didChangeImageAtIndex:(NSInteger)index
 {
     self.selectedNestedItemPosition = index;

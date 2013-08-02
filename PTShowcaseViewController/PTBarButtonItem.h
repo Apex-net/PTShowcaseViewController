@@ -16,6 +16,7 @@
 
 // Bar button subclass, to manage uniqueName and index
 @property (nonatomic, strong) NSString *showcaseUniqueName;
+@property (nonatomic, strong) NSString *itemUniqueName;
 @property (nonatomic, assign) NSUInteger index;
 
 @end

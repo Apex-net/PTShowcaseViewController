@@ -30,6 +30,8 @@
 
 - (id)initWithUniqueName:(NSString *)uniqueName;
 
+- (void)validateBarButtonItems:(NSArray *)buttons;
+
 @end
 
 #pragma mark - Group detail
