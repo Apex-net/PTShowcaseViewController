@@ -49,6 +49,11 @@
     return [[self.navigationController.viewControllers objectAtIndex:0] shouldAutorotateToInterfaceOrientation:interfaceOrientation];
 }
 
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    return [[self.navigationController.viewControllers objectAtIndex:0] willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
+}
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
