@@ -193,7 +193,11 @@
     NSInteger relativeIndex = imageAlbumViewController.photoAlbumView.centerPageIndex;
     NSInteger index = [self.showcaseView indexForItemAtRelativeIndex:relativeIndex withContentType:PTContentTypeImage];
     [self.showcaseView scrollToObjectAtIndex:index atScrollPosition:GMGridViewScrollPositionTop animated:NO];
-    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kShowcaseDetailPhotoDismissNotification object:nil];
+    if (self.activityPopoverController) {
+        [self.activityPopoverController dismissPopoverAnimated:YES];
+        self.activityPopoverController = nil;
+    }
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
