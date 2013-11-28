@@ -68,8 +68,6 @@
 - (id)init
 {
     return [self initWithUniqueName:nil];
-    
-    // share option disabled by default
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -123,7 +121,7 @@
     if (self.showcaseView.showcaseDataSource == nil) {
         self.showcaseView.showcaseDataSource = self;
     }
-    
+
     // Internal
     self.showcaseView.dataSource = self.showcaseView; // this will trigger 'reloadData' automatically
     self.showcaseView.actionDelegate = self;
@@ -160,9 +158,7 @@
     [super didReceiveMemoryWarning];
     
     if ([self isViewLoaded] && [self.view window] == nil) {
-        [self viewWillUnload];
         [self setView:nil];
-        [self viewDidUnload];
     }
 }
 
@@ -200,7 +196,7 @@
     NSInteger relativeIndex = imageAlbumViewController.photoAlbumView.centerPageIndex;
     NSInteger index = [self.showcaseView indexForItemAtRelativeIndex:relativeIndex withContentType:PTContentTypeImage];
     [self.showcaseView scrollToObjectAtIndex:index atScrollPosition:GMGridViewScrollPositionTop animated:NO];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kShowcaseDetailPhotoDismissNotification object:nil];
+
     if (self.activityPopoverController) {
         [self.activityPopoverController dismissPopoverAnimated:YES];
         self.activityPopoverController = nil;
@@ -353,30 +349,20 @@
                 url = [NSURL URLWithString:path];
             }
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            
-            PSPDFDocument *document = [PSPDFDocument PDFDocumentWithUrl:url];
-            document.title = text;
-            
-            PSPDFViewController *detailViewController = [[PSPDFViewController alloc] initWithDocument:document];
-            detailViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-            detailViewController.backgroundColor = self.view.backgroundColor;
-            
-            // PSPDFKit buttons
-            NSMutableArray *barButtons = [[NSMutableArray alloc] initWithObjects: detailViewController.searchButtonItem, detailViewController.outlineButtonItem, detailViewController.viewModeButtonItem, nil];
-            
-            // button to share image
-            if (self.activityButtonEnabled) {
-                self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
-                [barButtons addObject:self.actionBarButtonItem];
-            }
-            
-            detailViewController.rightBarButtonItems = barButtons;
-            
-            UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:detailViewController];
-            
-            // TODO zoom in/out (just like in Photos.app in the iPad)
-            [self presentViewController:navCtrl animated:YES completion:NULL];
-            
+
+#warning TODO Missing implementation
+//            PSPDFDocument *document = [PSPDFDocument PDFDocumentWithURL:url];
+//            document.title = text;
+//
+//            PSPDFViewController *detailViewController = [[PSPDFViewController alloc] initWithDocument:document];
+//            detailViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+//            detailViewController.backgroundColor = self.view.backgroundColor;
+//            
+//            UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:detailViewController];
+//
+//            // TODO zoom in/out (just like in Photos.app in the iPad)
+//            [self presentViewController:navCtrl animated:YES completion:NULL];
+
             break;
         }
             
