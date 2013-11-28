@@ -27,7 +27,7 @@
 
 @end
 
-@interface PTShowcaseViewController () <GMGridViewActionDelegate, PTImageAlbumViewDataSource, PTImageAlbumViewDelegate, UIPopoverControllerDelegate>
+@interface PTShowcaseViewController () <GMGridViewActionDelegate, PTImageAlbumViewDataSource, PTImageAlbumViewDelegate, UIPopoverControllerDelegate, UIDocumentInteractionControllerDelegate>
 
 @property (strong, nonatomic) UIPopoverController *activityPopoverController;
 @property (strong, nonatomic) UIBarButtonItem *actionBarButtonItem;
@@ -49,6 +49,13 @@
     return [[self.navigationController.viewControllers objectAtIndex:0] shouldAutorotateToInterfaceOrientation:interfaceOrientation];
 }
 
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    if ([self.navigationController.viewControllers objectAtIndex:0] != self) {
+        return [[self.navigationController.viewControllers objectAtIndex:0] willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
+    }
+}
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,8 +68,6 @@
 - (id)init
 {
     return [self initWithUniqueName:nil];
-    
-    // share option disabled by default
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -116,7 +121,7 @@
     if (self.showcaseView.showcaseDataSource == nil) {
         self.showcaseView.showcaseDataSource = self;
     }
-    
+
     // Internal
     self.showcaseView.dataSource = self.showcaseView; // this will trigger 'reloadData' automatically
     self.showcaseView.actionDelegate = self;
@@ -153,9 +158,7 @@
     [super didReceiveMemoryWarning];
     
     if ([self isViewLoaded] && [self.view window] == nil) {
-        [self viewWillUnload];
         [self setView:nil];
-        [self viewDidUnload];
     }
 }
 
@@ -193,7 +196,11 @@
     NSInteger relativeIndex = imageAlbumViewController.photoAlbumView.centerPageIndex;
     NSInteger index = [self.showcaseView indexForItemAtRelativeIndex:relativeIndex withContentType:PTContentTypeImage];
     [self.showcaseView scrollToObjectAtIndex:index atScrollPosition:GMGridViewScrollPositionTop animated:NO];
-    
+
+    if (self.activityPopoverController) {
+        [self.activityPopoverController dismissPopoverAnimated:YES];
+        self.activityPopoverController = nil;
+    }
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
@@ -342,30 +349,15 @@
                 url = [NSURL URLWithString:path];
             }
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            
-            PSPDFDocument *document = [PSPDFDocument PDFDocumentWithUrl:url];
-            document.title = text;
-            
-            PSPDFViewController *detailViewController = [[PSPDFViewController alloc] initWithDocument:document];
-            detailViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-            detailViewController.backgroundColor = self.view.backgroundColor;
-            
-            // PSPDFKit buttons
-            NSMutableArray *barButtons = [[NSMutableArray alloc] initWithObjects: detailViewController.searchButtonItem, detailViewController.outlineButtonItem, detailViewController.viewModeButtonItem, nil];
-            
-            // button to share image
-            if (self.activityButtonEnabled) {
-                self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
-                [barButtons addObject:self.actionBarButtonItem];
-            }
-            
-            detailViewController.rightBarButtonItems = barButtons;
-            
-            UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:detailViewController];
-            
-            // TODO zoom in/out (just like in Photos.app in the iPad)
-            [self presentViewController:navCtrl animated:YES completion:NULL];
-            
+
+            // Initialize Document Interaction Controller
+            UIDocumentInteractionController *documentInteractionController = [UIDocumentInteractionController interactionControllerWithURL:url];
+            documentInteractionController.name = text;
+            documentInteractionController.delegate = self;
+                
+            // Preview PDF
+            [documentInteractionController presentPreviewAnimated:YES];
+
             break;
         }
             
@@ -418,11 +410,11 @@
     abort();
 }
 
-#pragma mark - PTImageAlbumViewDelegate
+#pragma mark - UIDocumentInteractionControllerDelegate
 
-- (void)imageAlbumView:(PTImageAlbumView *)imageAlbumView didChangeImageAtIndex:(NSInteger)index
+- (UIViewController *)documentInteractionControllerViewControllerForPreview:(UIDocumentInteractionController *)controller
 {
-    self.selectedNestedItemPosition = index;
+    return self;
     
     for (UIBarButtonItem *item in self.additionalBarButtonItems) {        
         if ([item isKindOfClass:[PTBarButtonItem class]]) {
@@ -442,7 +434,7 @@
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
-#pragma mark - UIPopoverController and WEPopoverController delegate
+#pragma mark - UIPopoverController delegate
 
 - (void)popoverControllerDidDismissPopover:(NSObject *)popoverController
 {

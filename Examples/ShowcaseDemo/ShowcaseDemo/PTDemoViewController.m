@@ -76,7 +76,9 @@
     [super viewDidLoad];
     
     self.title = @"Showcase";
-
+    self.activityButtonEnabled = YES;
+    self.maxSharingFileSize = @(20*1024*1024);
+    
     ////////////////////////////////////////////////////////////////////////////
 
     /*
