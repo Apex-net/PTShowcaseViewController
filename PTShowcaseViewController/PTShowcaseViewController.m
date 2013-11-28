@@ -27,7 +27,7 @@
 
 @end
 
-@interface PTShowcaseViewController () <GMGridViewActionDelegate, PTImageAlbumViewDataSource, PTImageAlbumViewDelegate, UIPopoverControllerDelegate>
+@interface PTShowcaseViewController () <GMGridViewActionDelegate, PTImageAlbumViewDataSource, PTImageAlbumViewDelegate, UIPopoverControllerDelegate, UIDocumentInteractionControllerDelegate>
 
 @property (strong, nonatomic) UIPopoverController *activityPopoverController;
 @property (strong, nonatomic) UIBarButtonItem *actionBarButtonItem;
@@ -350,18 +350,13 @@
             }
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-#warning TODO Missing implementation
-//            PSPDFDocument *document = [PSPDFDocument PDFDocumentWithURL:url];
-//            document.title = text;
-//
-//            PSPDFViewController *detailViewController = [[PSPDFViewController alloc] initWithDocument:document];
-//            detailViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-//            detailViewController.backgroundColor = self.view.backgroundColor;
-//            
-//            UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:detailViewController];
-//
-//            // TODO zoom in/out (just like in Photos.app in the iPad)
-//            [self presentViewController:navCtrl animated:YES completion:NULL];
+            // Initialize Document Interaction Controller
+            UIDocumentInteractionController *documentInteractionController = [UIDocumentInteractionController interactionControllerWithURL:url];
+            documentInteractionController.name = text;
+            documentInteractionController.delegate = self;
+                
+            // Preview PDF
+            [documentInteractionController presentPreviewAnimated:YES];
 
             break;
         }
@@ -415,11 +410,11 @@
     abort();
 }
 
-#pragma mark - PTImageAlbumViewDelegate
+#pragma mark - UIDocumentInteractionControllerDelegate
 
-- (void)imageAlbumView:(PTImageAlbumView *)imageAlbumView didChangeImageAtIndex:(NSInteger)index
+- (UIViewController *)documentInteractionControllerViewControllerForPreview:(UIDocumentInteractionController *)controller
 {
-    self.selectedNestedItemPosition = index;
+    return self;
     
     for (UIBarButtonItem *item in self.additionalBarButtonItems) {        
         if ([item isKindOfClass:[PTBarButtonItem class]]) {
@@ -439,7 +434,7 @@
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
-#pragma mark - UIPopoverController and WEPopoverController delegate
+#pragma mark - UIPopoverController delegate
 
 - (void)popoverControllerDidDismissPopover:(NSObject *)popoverController
 {
