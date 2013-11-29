@@ -415,8 +415,15 @@
 - (UIViewController *)documentInteractionControllerViewControllerForPreview:(UIDocumentInteractionController *)controller
 {
     return self;
+}
+
+#pragma mark - PTImageAlbumViewDelegate
+
+- (void)imageAlbumView:(PTImageAlbumView *)imageAlbumView didChangeImageAtIndex:(NSInteger)index
+{
+    self.selectedNestedItemPosition = index;
     
-    for (UIBarButtonItem *item in self.additionalBarButtonItems) {        
+    for (UIBarButtonItem *item in self.additionalBarButtonItems) {
         if ([item isKindOfClass:[PTBarButtonItem class]]) {
             PTBarButtonItem *button = (PTBarButtonItem *)item;
             button.index = [self.showcaseView indexForItemAtRelativeIndex:self.selectedNestedItemPosition withContentType:PTContentTypeImage];
