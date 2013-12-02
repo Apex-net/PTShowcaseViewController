@@ -36,6 +36,10 @@
 
 @property (strong, nonatomic) NSArray *additionalBarButtonItems;
 
+// see: http://stackoverflow.com/questions/19462710/dismissing-a-uidocumentinteractioncontroller-in-some-cases-will-remove-the-prese
+@property (nonatomic, strong) UIView *parentView;
+@property (nonatomic, strong) UIView *containerView;
+
 - (void)dismissImageDetailViewController;
 
 @end
@@ -415,6 +419,37 @@
 - (UIViewController *)documentInteractionControllerViewControllerForPreview:(UIDocumentInteractionController *)controller
 {
     return self;
+}
+
+- (void)documentInteractionControllerWillBeginPreview:(__unused UIDocumentInteractionController *)controller
+{
+    if (UIUserInterfaceIdiomPad == UI_USER_INTERFACE_IDIOM()) {
+        // work around iOS 7 bug on ipad
+        
+        self.parentView = [[[self.view superview] superview] superview];
+        self.containerView = [self.parentView superview];
+        
+        if (![[self.containerView superview] isKindOfClass:[UIWindow class]]) {
+            // our assumption about the view hierarchy is broken, abort
+            self.containerView = nil;
+            self.parentView = nil;
+        }
+    }
+}
+
+- (void)documentInteractionControllerDidEndPreview:(__unused UIDocumentInteractionController *)controller
+{
+    if (UIUserInterfaceIdiomPad == UI_USER_INTERFACE_IDIOM()) {
+        if (!self.view.window && self.containerView) {
+            assert(self.parentView);
+            CGRect frame = self.parentView.frame;
+            frame.origin = CGPointZero;
+            self.parentView.frame = frame;
+            [self.containerView addSubview:self.parentView];
+            self.containerView = nil;
+            self.parentView = nil;
+        }
+    }
 }
 
 #pragma mark - PTImageAlbumViewDelegate
