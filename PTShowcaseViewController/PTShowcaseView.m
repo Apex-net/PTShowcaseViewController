@@ -269,7 +269,7 @@ typedef enum {
         contentType = [NSNumber numberWithInteger:[self.showcaseDataSource showcaseView:self contentTypeForItemAtIndex:index]];
         [[self.cachedData objectAtIndex:index] setObject:contentType forKey:@"contentType"];
     }
-    return [contentType integerValue];
+    return (int)[contentType integerValue];
 }
 
 - (PTItemOrientation)orientationForItemAtIndex:(NSInteger)index
@@ -286,7 +286,7 @@ typedef enum {
         [[self.cachedData objectAtIndex:index] setObject:orientation forKey:@"orientation"];
     }
 
-    return [orientation integerValue];
+    return (int)[orientation integerValue];
 }
 
 - (CGSize)sizeForThumbnailImageOfItemAtIndex:(NSInteger)index
