@@ -51,6 +51,9 @@ typedef enum {
 - (GMGridViewCell *)reusableVideoCellWithReuseIdentifier:(NSString *)identifier forOrientation:(PTItemOrientation)orientation;
 - (GMGridViewCell *)reusablePdfCellWithReuseIdentifier:(NSString *)identifier forOrientation:(PTItemOrientation)orientation;
 
+// Utilities
+- (UIImage *)contentType:(PTContentType)contentType initialImageForOrientation:(PTItemOrientation)orientation;
+
 @end
 
 #pragma mark - Video thumbnail
@@ -576,11 +579,11 @@ typedef enum {
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         // Placeholder
 
-        NSString *placeholderImageName = @"PTShowcase.bundle/group.png";
+        UIImage *placeholderImage = [self contentType:PTContentTypeGroup initialImageForOrientation:orientation];
         CGRect placeholderImageNameImageViewFrame = CGRectMake(2.5, 2.5, 75.0, 75.0);
 
         UIImageView *placeholderImageView = [[UIImageView alloc] initWithFrame:placeholderImageNameImageViewFrame];
-        placeholderImageView.image = [UIImage imageNamed:placeholderImageName];
+        placeholderImageView.image = placeholderImage;
         [cell.contentView addSubview:placeholderImageView];
     }
     else {
@@ -596,15 +599,14 @@ typedef enum {
 
         // Thumbnail
 
-        NSString *loadingImageName = [NSString stringWithFormat:@"PTShowcase.bundle/%@-%@.png", @"thumbnail-loading",
-                                      orientation == PTItemOrientationPortrait ? @"portrait" : @"landscape"];
+        UIImage *loadingImage = [self contentType:PTContentTypeGroup initialImageForOrientation:orientation];
         CGRect loadingImageViewFrame = orientation == PTItemOrientationPortrait
         ? CGRectMake(60.0, 28.0, 135.0, 180.0)
         : CGRectMake(40.0, 50.0, 180.0, 135.0);
 
         NINetworkImageView *thumbnailView = [[NINetworkImageView alloc] initWithFrame:loadingImageViewFrame];
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = [UIImage imageNamed:loadingImageName];
+        thumbnailView.initialImage = loadingImage;
         [cell.contentView addSubview:thumbnailView];
     }
 
@@ -631,11 +633,11 @@ typedef enum {
 
         // Thumbnail
 
-        NSString *loadingImageName = @"PTShowcase.bundle/image-loading.png";
+        UIImage *initialImage = [self contentType:PTContentTypeImage initialImageForOrientation:orientation];
 
         NINetworkImageView *thumbnailView = [[NINetworkImageView alloc] initWithFrame:backImageViewFrame];
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = [UIImage imageNamed:loadingImageName];
+        thumbnailView.initialImage = initialImage;
         [cell.contentView addSubview:thumbnailView];
 
         // Overlap
@@ -659,12 +661,11 @@ typedef enum {
 
         // Thumbnail
 
-        NSString *loadingImageName = [NSString stringWithFormat:@"PTShowcase.bundle/%@-%@.png", @"thumbnail-loading",
-                                      orientation == PTItemOrientationPortrait ? @"portrait" : @"landscape"];
+        UIImage *initialImage = [self contentType:PTContentTypeImage initialImageForOrientation:orientation];
 
         NINetworkImageView *thumbnailView = [[NINetworkImageView alloc] initWithFrame:backImageViewFrame];
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = [UIImage imageNamed:loadingImageName];
+        thumbnailView.initialImage = initialImage;
         [cell.contentView addSubview:thumbnailView];
 
         // Overlap
@@ -691,13 +692,12 @@ typedef enum {
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         // Thumbnail
 
-        NSString *loadingImageName = @"PTShowcase.bundle/video-loading.png";
+        UIImage *initialImage = [self contentType:PTContentTypeVideo initialImageForOrientation:orientation];
         CGRect loadingImageViewFrame = CGRectMake(2.5, 2.5, 75.0, 75.0);
-        UIImage *maskedImage = [PTVideoThumbnailImageView applyMask:[UIImage imageNamed:loadingImageName] forOrientation:orientation];
 
         PTVideoThumbnailImageView *thumbnailView = [[PTVideoThumbnailImageView alloc] initWithFrame:loadingImageViewFrame];
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = maskedImage;
+        thumbnailView.initialImage = initialImage;
         [cell.contentView addSubview:thumbnailView];
 
         // Overlap
@@ -709,13 +709,12 @@ typedef enum {
     else {
         // Thumbnail
 
-        NSString *loadingImageName = @"PTShowcase.bundle/video-loading.png";
+        UIImage *initialImage = [self contentType:PTContentTypeVideo initialImageForOrientation:orientation];
         CGRect loadingImageViewFrame = CGRectMake(8.0, 30.0, 240.0, 180.0);
-        UIImage *maskedImage = [PTVideoThumbnailImageView applyMask:[UIImage imageNamed:loadingImageName] forOrientation:orientation];
 
         PTVideoThumbnailImageView *thumbnailView = [[PTVideoThumbnailImageView alloc] initWithFrame:loadingImageViewFrame];
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = maskedImage;
+        thumbnailView.initialImage = initialImage;
         [cell.contentView addSubview:thumbnailView];
 
         // Overlap
@@ -740,13 +739,12 @@ typedef enum {
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         // Thumbnail
 
-        NSString *loadingImageName = @"PTShowcase.bundle/document-loading.png";
+        UIImage *initialImage = [self contentType:PTContentTypePdf initialImageForOrientation:orientation];
         CGRect loadingImageViewFrame = CGRectMake(2.5, 2.5, 75.0, 75.0);
-        UIImage *maskedImage = [PTPdfThumbnailImageView applyMask:[UIImage imageNamed:loadingImageName] forOrientation:orientation];
 
         PTPdfThumbnailImageView *thumbnailView = [[PTPdfThumbnailImageView alloc] initWithFrame:loadingImageViewFrame];
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = maskedImage;
+        thumbnailView.initialImage = initialImage;
         [cell.contentView addSubview:thumbnailView];
 
         // Overlap
@@ -768,19 +766,96 @@ typedef enum {
 
         // Thumbnail
 
-        NSString *loadingImageName = [NSString stringWithFormat:@"PTShowcase.bundle/%@-%@.png", @"thumbnail-loading",
-                                      orientation == PTItemOrientationPortrait ? @"portrait" : @"landscape"];
+        UIImage *initialImage = [self contentType:PTContentTypePdf initialImageForOrientation:orientation];
         CGRect loadingImageViewFrame = orientation == PTItemOrientationPortrait
         ? CGRectMake(60.0, 38.0, 135.0, 180.0)
         : CGRectMake(38.0, 61.0, 180.0, 135.0);
 
         NINetworkImageView *thumbnailView = [[NINetworkImageView alloc] initWithFrame:loadingImageViewFrame];
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = [UIImage imageNamed:loadingImageName];
+        thumbnailView.initialImage = initialImage;
         [cell.contentView addSubview:thumbnailView];
     }
 
     return cell;
+}
+
+- (UIImage *)contentType:(PTContentType)contentType initialImageForOrientation:(PTItemOrientation)orientation
+{
+    UIImage *initialImage;
+    
+    // Get initial Thumbnail image (placeholder)
+    
+    switch (contentType) {
+        case PTContentTypeGroup:
+        {
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+                NSString *placeholderImageName = @"PTShowcase.bundle/group.png";
+                initialImage = [UIImage imageNamed:placeholderImageName];
+            }
+            else {
+                NSString *loadingImageName = [NSString stringWithFormat:@"PTShowcase.bundle/%@-%@.png", @"thumbnail-loading",
+                                              orientation == PTItemOrientationPortrait ? @"portrait" : @"landscape"];
+                initialImage = [UIImage imageNamed:loadingImageName];
+            }
+            
+            break;
+        }
+        case PTContentTypeImage:
+        {
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+                NSString *loadingImageName = @"PTShowcase.bundle/image-loading.png";
+                initialImage = [UIImage imageNamed:loadingImageName];
+            }
+            else {
+                NSString *loadingImageName = [NSString stringWithFormat:@"PTShowcase.bundle/%@-%@.png", @"thumbnail-loading",
+                                              orientation == PTItemOrientationPortrait ? @"portrait" : @"landscape"];
+                initialImage = [UIImage imageNamed:loadingImageName];
+            }
+            break;
+        }
+        case PTContentTypeVideo:
+        {
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+                NSString *loadingImageName = @"PTShowcase.bundle/video-loading.png";
+                UIImage *maskedImage = [PTVideoThumbnailImageView applyMask:[UIImage imageNamed:loadingImageName] forOrientation:orientation];
+                initialImage = maskedImage;
+                
+            }
+            else {
+                NSString *loadingImageName = @"PTShowcase.bundle/video-loading.png";
+                UIImage *maskedImage = [PTVideoThumbnailImageView applyMask:[UIImage imageNamed:loadingImageName] forOrientation:orientation];
+                initialImage = maskedImage;
+            }
+            break;
+        }
+        case PTContentTypePdf:
+        {
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+                // Thumbnail
+                
+                NSString *loadingImageName = @"PTShowcase.bundle/document-loading.png";
+                UIImage *maskedImage = [PTPdfThumbnailImageView applyMask:[UIImage imageNamed:loadingImageName] forOrientation:orientation];
+                initialImage = maskedImage;
+            }
+            else {
+                // Thumbnail
+                
+                NSString *loadingImageName = [NSString stringWithFormat:@"PTShowcase.bundle/%@-%@.png", @"thumbnail-loading",
+                                              orientation == PTItemOrientationPortrait ? @"portrait" : @"landscape"];
+                initialImage = [UIImage imageNamed:loadingImageName];
+            }
+            
+            break;
+        }
+        default:
+            break;
+    }
+    
+    
+    
+    return initialImage;
+    
 }
 
 #pragma mark GMGridViewDataSource
@@ -812,7 +887,11 @@ typedef enum {
     GMGridViewCell *cell = [self GMGridView:gridView reusableCellForContentType:contentType withOrientation:orientation];
     NINetworkImageView *thumbnailView = (NINetworkImageView *)[cell.contentView viewWithTag:PTShowcaseTagThumbnail];
     thumbnailView.contentMode = UIViewContentModeScaleAspectFill;
-    thumbnailView.image = thumbnailView.initialImage;
+
+    UIImage *initialImage = [self contentType:contentType initialImageForOrientation:orientation];
+    if (initialImage != nil) {
+        thumbnailView.image = initialImage;
+    }
     
     if (thumbnailImageSource != nil) {
 
