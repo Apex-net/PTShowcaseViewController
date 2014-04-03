@@ -22,10 +22,6 @@
 		50A2F63614F63EE0009EE464 /* ShowcaseDemo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 50A2F63514F63EE0009EE464 /* ShowcaseDemo.plist */; };
 		50A601AE14F556A3002076AB /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A601AD14F556A3002076AB /* MediaPlayer.framework */; };
 		50A601B014F55D99002076AB /* ShowcaseDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 50A601AF14F55D99002076AB /* ShowcaseDemo.bundle */; };
-		50ACF7281844E4EB00DEB286 /* PT_CaptionedPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 50ACF71F1844E4EB00DEB286 /* PT_CaptionedPhotoView.m */; };
-		50ACF7291844E4EB00DEB286 /* PT_NetworkPhotoAlbumViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 50ACF7211844E4EB00DEB286 /* PT_NetworkPhotoAlbumViewController.m */; };
-		50ACF72A1844E4EB00DEB286 /* PTImageAlbumView.m in Sources */ = {isa = PBXBuildFile; fileRef = 50ACF7231844E4EB00DEB286 /* PTImageAlbumView.m */; };
-		50ACF72B1844E4EB00DEB286 /* PTImageAlbumViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 50ACF7251844E4EB00DEB286 /* PTImageAlbumViewController.m */; };
 		50DE74F314E964FE0070F1FE /* PTShowcase.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 50DE74F214E964FE0070F1FE /* PTShowcase.bundle */; };
 		50FC0D1A14E3D44300F28648 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50FC0D1914E3D44300F28648 /* UIKit.framework */; };
 		50FC0D1C14E3D44300F28648 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50FC0D1B14E3D44300F28648 /* Foundation.framework */; };
@@ -55,16 +51,6 @@
 		50A2F63514F63EE0009EE464 /* ShowcaseDemo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ShowcaseDemo.plist; sourceTree = "<group>"; };
 		50A601AD14F556A3002076AB /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		50A601AF14F55D99002076AB /* ShowcaseDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = ShowcaseDemo.bundle; sourceTree = "<group>"; };
-		50ACF71E1844E4EB00DEB286 /* PT_CaptionedPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PT_CaptionedPhotoView.h; sourceTree = "<group>"; };
-		50ACF71F1844E4EB00DEB286 /* PT_CaptionedPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PT_CaptionedPhotoView.m; sourceTree = "<group>"; };
-		50ACF7201844E4EB00DEB286 /* PT_NetworkPhotoAlbumViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PT_NetworkPhotoAlbumViewController.h; sourceTree = "<group>"; };
-		50ACF7211844E4EB00DEB286 /* PT_NetworkPhotoAlbumViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PT_NetworkPhotoAlbumViewController.m; sourceTree = "<group>"; };
-		50ACF7221844E4EB00DEB286 /* PTImageAlbumView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTImageAlbumView.h; sourceTree = "<group>"; };
-		50ACF7231844E4EB00DEB286 /* PTImageAlbumView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTImageAlbumView.m; sourceTree = "<group>"; };
-		50ACF7241844E4EB00DEB286 /* PTImageAlbumViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTImageAlbumViewController.h; sourceTree = "<group>"; };
-		50ACF7251844E4EB00DEB286 /* PTImageAlbumViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTImageAlbumViewController.m; sourceTree = "<group>"; };
-		50ACF7261844E4EB00DEB286 /* PTImageAlbumViewDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTImageAlbumViewDataSource.h; sourceTree = "<group>"; };
-		50ACF7271844E4EB00DEB286 /* PTImageAlbumViewDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTImageAlbumViewDelegate.h; sourceTree = "<group>"; };
 		50DE74F214E964FE0070F1FE /* PTShowcase.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = PTShowcase.bundle; sourceTree = "<group>"; };
 		50FC0D1514E3D44300F28648 /* ShowcaseDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShowcaseDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50FC0D1914E3D44300F28648 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -131,28 +117,9 @@
 		50ACF6E91844E4D700DEB286 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				50ACF71D1844E4EB00DEB286 /* PTImageAlbumViewController */,
 			);
 			name = Libraries;
 			path = ../../Libraries;
-			sourceTree = "<group>";
-		};
-		50ACF71D1844E4EB00DEB286 /* PTImageAlbumViewController */ = {
-			isa = PBXGroup;
-			children = (
-				50ACF71E1844E4EB00DEB286 /* PT_CaptionedPhotoView.h */,
-				50ACF71F1844E4EB00DEB286 /* PT_CaptionedPhotoView.m */,
-				50ACF7201844E4EB00DEB286 /* PT_NetworkPhotoAlbumViewController.h */,
-				50ACF7211844E4EB00DEB286 /* PT_NetworkPhotoAlbumViewController.m */,
-				50ACF7221844E4EB00DEB286 /* PTImageAlbumView.h */,
-				50ACF7231844E4EB00DEB286 /* PTImageAlbumView.m */,
-				50ACF7241844E4EB00DEB286 /* PTImageAlbumViewController.h */,
-				50ACF7251844E4EB00DEB286 /* PTImageAlbumViewController.m */,
-				50ACF7261844E4EB00DEB286 /* PTImageAlbumViewDataSource.h */,
-				50ACF7271844E4EB00DEB286 /* PTImageAlbumViewDelegate.h */,
-			);
-			name = PTImageAlbumViewController;
-			path = PTImageAlbumViewController/PTImageAlbumViewController;
 			sourceTree = "<group>";
 		};
 		50FC0D0A14E3D44300F28648 = {
@@ -327,11 +294,7 @@
 				5093F24E14E532F1004DC805 /* PTShowcaseViewController.m in Sources */,
 				5093F25314E53496004DC805 /* PTShowcaseView.m in Sources */,
 				5093F29114E557A3004DC805 /* PTDemoViewController.m in Sources */,
-				50ACF7281844E4EB00DEB286 /* PT_CaptionedPhotoView.m in Sources */,
 				5708C2861847B59000D150A0 /* PTBarButtonItem.m in Sources */,
-				50ACF7291844E4EB00DEB286 /* PT_NetworkPhotoAlbumViewController.m in Sources */,
-				50ACF72A1844E4EB00DEB286 /* PTImageAlbumView.m in Sources */,
-				50ACF72B1844E4EB00DEB286 /* PTImageAlbumViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

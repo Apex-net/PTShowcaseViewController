@@ -33,10 +33,3 @@
 - (void)validateBarButtonItems:(NSArray *)buttons;
 
 @end
-
-#pragma mark - Group detail
-
-@interface PTGroupDetailViewController : PTShowcaseViewController
-
-@end
-

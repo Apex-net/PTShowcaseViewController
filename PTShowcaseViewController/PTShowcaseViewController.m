@@ -16,18 +16,26 @@
 
 #import "PTShowcaseViewController.h"
 
-#import "PTImageAlbumViewController.h"
 #import "PTBarButtonItem.h"
+
 #import <MediaPlayer/MediaPlayer.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Private APIs
 ////////////////////////////////////////////////////////////////////////////////
+
+#pragma mark - Group detail
+
+@interface PTGroupDetailViewController : PTShowcaseViewController
+
+@end
+
 @interface PTShowcaseView () <GMGridViewDataSource>
 
 @end
 
-@interface PTShowcaseViewController () <GMGridViewActionDelegate, PTImageAlbumViewDataSource, PTImageAlbumViewDelegate, UIPopoverControllerDelegate, UIDocumentInteractionControllerDelegate>
+@interface PTShowcaseViewController () <GMGridViewActionDelegate, MWPhotoBrowserDelegate,
+    UIPopoverControllerDelegate, UIDocumentInteractionControllerDelegate>
 
 @property (strong, nonatomic) UIPopoverController *activityPopoverController;
 @property (strong, nonatomic) UIBarButtonItem *actionBarButtonItem;
@@ -39,8 +47,6 @@
 // see: http://stackoverflow.com/questions/19462710/dismissing-a-uidocumentinteractioncontroller-in-some-cases-will-remove-the-prese
 @property (nonatomic, strong) UIView *parentView;
 @property (nonatomic, strong) UIView *containerView;
-
-- (void)dismissImageDetailViewController;
 
 @end
 
@@ -178,7 +184,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    // Phone: any orientation except upside down
+    // Phone: any orientation except upside dow
     // Pad  : any orientation is just fine
     
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
@@ -189,24 +195,6 @@
 }
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#warning move to view
-
-#pragma mark - ()
-
-- (void)dismissImageDetailViewController
-{
-    UINavigationController *navCtrl = (UINavigationController *)self.presentedViewController;
-    PTImageAlbumViewController *imageAlbumViewController = (PTImageAlbumViewController *)[[navCtrl viewControllers] objectAtIndex:0];
-    NSInteger relativeIndex = imageAlbumViewController.photoAlbumView.centerPageIndex;
-    NSInteger index = [self.showcaseView indexForItemAtRelativeIndex:relativeIndex withContentType:PTContentTypeImage];
-    [self.showcaseView scrollToObjectAtIndex:index atScrollPosition:GMGridViewScrollPositionTop animated:NO];
-
-    if (self.activityPopoverController) {
-        [self.activityPopoverController dismissPopoverAnimated:YES];
-        self.activityPopoverController = nil;
-    }
-    [self dismissViewControllerAnimated:YES completion:NULL];
-}
 
 #pragma mark - GMGridViewActionDelegate
 
@@ -244,42 +232,38 @@
         {
             NSInteger relativeIndex = [self.showcaseView relativeIndexForItemAtIndex:position withContentType:contentType];
             
-            PTImageAlbumViewController *detailViewController = [[PTImageAlbumViewController alloc] initWithImageAtIndex:relativeIndex];
-            detailViewController.imageAlbumView.imageAlbumDataSource = self;
-            detailViewController.imageAlbumView.imageAlbumDelegate = self;
-            detailViewController.view.backgroundColor = [UIColor blackColor];
-            detailViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+            // Create browser
+            MWPhotoBrowser *browser = [[MWPhotoBrowser alloc] initWithDelegate:self];
+            browser.displayActionButton = YES;
+            browser.navigationToolbarType = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone
+            ? MWPhotoBrowserNavigationToolbarTypeButtons
+            : MWPhotoBrowserNavigationToolbarTypeScrubber;
+            browser.zoomPhotosToFill = YES;
+#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
+            browser.wantsFullScreenLayout = YES;
+#endif
             
             self.selectedNestedItemPosition = relativeIndex;
             
-            UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:detailViewController];
-            
-            // button to close the image album
-            UIBarButtonItem *dismissButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissImageDetailViewController)];
-            detailViewController.navigationItem.leftBarButtonItem = dismissButton;
+            UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:browser];
+            navCtrl.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
             
             NSMutableArray *barButtons = [[NSMutableArray alloc] init];
-            
-            // button to share image
-            if (self.activityButtonEnabled) {
-                self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
-                [barButtons addObject:self.actionBarButtonItem];
-            }
-            
+        
             // additional buttons
-            if ([self.showcaseView.showcaseDataSource respondsToSelector:@selector(showcaseView:additionalBarButtonItemsForImageAlbumViewController:)]) {
-                self.additionalBarButtonItems = [self.showcaseView.showcaseDataSource showcaseView:self.showcaseView additionalBarButtonItemsForImageAlbumViewController:detailViewController];
-                
+            if ([self.showcaseView.showcaseDataSource respondsToSelector:@selector(showcaseView:additionalBarButtonItemsForPhotoViewCtrl:)]) {
+                self.additionalBarButtonItems = [self.showcaseView.showcaseDataSource showcaseView:self.showcaseView additionalBarButtonItemsForPhotoViewCtrl:browser];
+            
                 // check buttons class
                 [self validateBarButtonItems:self.additionalBarButtonItems];
                 
                 // force re-setting of bar button properties
-                [self imageAlbumView:detailViewController.imageAlbumView didChangeImageAtIndex:self.selectedNestedItemPosition];
+                [browser setCurrentPhotoIndex:self.selectedItemPosition];
                 
                 [barButtons addObjectsFromArray:self.additionalBarButtonItems];
             }
-                                    
-            detailViewController.navigationItem.rightBarButtonItems = barButtons;
+            
+            browser.navigationItem.rightBarButtonItems = barButtons;
             
             // TODO zoom in/out (just like in Photos.app in the iPad)
             [self presentViewController:navCtrl animated:YES completion:NULL];
@@ -369,29 +353,62 @@
     }
 }
 
-#pragma mark - PTImageAlbumViewDataSource
+#pragma mark - MWPhotoBrowserDelegate
 
-- (NSInteger)numberOfImagesInAlbumView:(PTImageAlbumView *)imageAlbumView
-{
+- (NSUInteger)numberOfPhotosInPhotoBrowser:(MWPhotoBrowser *)photoBrowser {
     return [self.showcaseView.imageItems count];
 }
 
-- (NSString *)imageAlbumView:(PTImageAlbumView *)imageAlbumView sourceForImageAtIndex:(NSInteger)index
-{
-    NSInteger i = [self.showcaseView indexForItemAtRelativeIndex:index withContentType:PTContentTypeImage];
-    return [self.showcaseView pathForItemAtIndex:i];
+- (id <MWPhoto>)photoBrowser:(MWPhotoBrowser *)photoBrowser photoAtIndex:(NSUInteger)index {
+    index = [self.showcaseView indexForItemAtRelativeIndex:index withContentType:PTContentTypeImage];
+    if (index < [self.showcaseView.imageItems count]) {
+#warning TODO add caching, so images are not re-instaced every time
+        MWPhoto *photo = [MWPhoto photoWithURL:[NSURL fileURLWithPath:[self.showcaseView pathForItemAtIndex:index]]];
+        photo.caption = [self.showcaseView detailTextForItemAtIndex:index];
+        return photo;
+    }
+
+    return nil;
 }
 
-- (NSString *)imageAlbumView:(PTImageAlbumView *)imageAlbumView sourceForThumbnailImageAtIndex:(NSInteger)index
-{
-    NSInteger i = [self.showcaseView indexForItemAtRelativeIndex:index withContentType:PTContentTypeImage];
-    return [self.showcaseView sourceForThumbnailImageOfItemAtIndex:i];
+- (id <MWPhoto>)photoBrowser:(MWPhotoBrowser *)photoBrowser thumbPhotoAtIndex:(NSUInteger)index {
+    index = [self.showcaseView indexForItemAtRelativeIndex:index withContentType:PTContentTypeImage];
+    if (index < [self.showcaseView.imageItems count]) {
+#warning TODO add caching, so images are not re-instaced every time
+        MWPhoto *photo = [MWPhoto photoWithURL:[NSURL fileURLWithPath:[self.showcaseView sourceForThumbnailImageOfItemAtIndex:index]]];
+        return photo;
+    }
+    
+    return nil;
 }
 
-- (NSString *)imageAlbumView:(PTImageAlbumView *)imageAlbumView captionForImageAtIndex:(NSInteger)index
-{
-    NSInteger i = [self.showcaseView indexForItemAtRelativeIndex:index withContentType:PTContentTypeImage];
-    return [self.showcaseView detailTextForItemAtIndex:i];
+//- (void)photoBrowser:(MWPhotoBrowser *)photoBrowser actionButtonPressedForPhotoAtIndex:(NSUInteger)index {
+//    NSLog(@"ACTION!");
+//}
+
+- (void)photoBrowser:(MWPhotoBrowser *)photoBrowser didDisplayPhotoAtIndex:(NSUInteger)index {
+    NSLog(@"Did start viewing photo at index %lu", (unsigned long)index);
+    
+    self.selectedNestedItemPosition = index;
+    
+    for (UIBarButtonItem *item in self.additionalBarButtonItems) {
+        if ([item isKindOfClass:[PTBarButtonItem class]]) {
+            PTBarButtonItem *button = (PTBarButtonItem *)item;
+            button.index = [self.showcaseView indexForItemAtRelativeIndex:self.selectedNestedItemPosition withContentType:PTContentTypeImage];
+            button.showcaseUniqueName = [self.showcaseView uniqueName];
+        }
+    }
+}
+
+- (void)photoBrowserDidFinishModalPresentation:(MWPhotoBrowser *)photoBrowser {
+    // If we subscribe to this method we must dismiss the view controller ourselves
+    NSLog(@"Did finish modal presentation");
+
+    NSInteger relativeIndex = photoBrowser.currentIndex;
+    NSInteger index = [self.showcaseView indexForItemAtRelativeIndex:relativeIndex withContentType:PTContentTypeImage];
+    [self.showcaseView scrollToObjectAtIndex:index atScrollPosition:GMGridViewScrollPositionTop animated:NO];
+    
+    [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
 #pragma mark - PTShowcaseViewDataSource
@@ -452,21 +469,6 @@
     }
 }
 
-#pragma mark - PTImageAlbumViewDelegate
-
-- (void)imageAlbumView:(PTImageAlbumView *)imageAlbumView didChangeImageAtIndex:(NSInteger)index
-{
-    self.selectedNestedItemPosition = index;
-    
-    for (UIBarButtonItem *item in self.additionalBarButtonItems) {
-        if ([item isKindOfClass:[PTBarButtonItem class]]) {
-            PTBarButtonItem *button = (PTBarButtonItem *)item;
-            button.index = [self.showcaseView indexForItemAtRelativeIndex:self.selectedNestedItemPosition withContentType:PTContentTypeImage];
-            button.showcaseUniqueName = [self.showcaseView uniqueName];
-        }
-    }
-}
-
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 #pragma mark - Movie Player utility
@@ -509,38 +511,6 @@
         case PTContentTypeGroup:
         {
             // nothing to do
-            break;
-        }
-            
-        case PTContentTypeImage:
-        {            
-            // Only text and image
-            NSInteger absoluteIndex = [self.showcaseView indexForItemAtRelativeIndex:self.selectedNestedItemPosition withContentType:PTContentTypeImage];
-            NSString *path = [self.showcaseView pathForItemAtIndex:absoluteIndex];
-            
-            // check max filesize
-            if ([self.showcaseView fileExceededMaxFileSize:path]) {
-                return;
-            }
-            
-            // TODO remove duplicate
-            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>            
-            // Check for file URLs.
-            if ([path hasPrefix:@"/"]) {
-                // If the url starts with / then it's likely a file URL, so treat it accordingly.
-                url = [NSURL fileURLWithPath:path];
-            }
-            else {
-                // Otherwise we assume it's a regular URL.
-                url = [NSURL URLWithString:path];
-            }
-            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            
-            text = [self.showcaseView detailTextForItemAtIndex:absoluteIndex] != nil
-            ? [self.showcaseView detailTextForItemAtIndex:absoluteIndex]
-            : [NSString string];
-            
-            NSLog(@"Image: %@ url: %@", text, path);
             break;
         }
             

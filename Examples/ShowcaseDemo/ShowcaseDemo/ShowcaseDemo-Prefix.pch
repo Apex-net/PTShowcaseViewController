@@ -15,5 +15,6 @@
     #import <Nimbus/NimbusCore.h>
     #import <Nimbus/NimbusPhotos.h>
     #import <Nimbus/NimbusNetworkImage.h>
+    #import <MWPhotoBrowser.h>
     ////////////////////////////////////////////////////////////////////////////
 #endif

@@ -8,3 +8,5 @@ pod 'Nimbus/NetworkImage', :podspec => 'https://gist.github.com/exalted/7655606/
 pod 'GMGridView', '~> 1.1.1'
 
 pod 'SDURLCache', '~> 1.2'
+
+pod 'MWPhotoBrowser', :git => 'https://github.com/Apex-net/MWPhotoBrowser.git'

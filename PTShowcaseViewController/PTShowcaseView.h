@@ -60,7 +60,7 @@ typedef enum {
 - (NSString *)showcaseView:(PTShowcaseView *)showcaseView sourceForThumbnailImageOfItemAtIndex:(NSInteger)index;
 - (NSString *)showcaseView:(PTShowcaseView *)showcaseView textForItemAtIndex:(NSInteger)index;
 - (NSString *)showcaseView:(PTShowcaseView *)showcaseView detailTextForItemAtIndex:(NSInteger)index;
-- (NSArray *)showcaseView:(PTShowcaseView *)showcaseView additionalBarButtonItemsForImageAlbumViewController:(PTImageAlbumViewController *)imageAlbumViewCtrl;
+- (NSArray *)showcaseView:(PTShowcaseView *)showcaseView additionalBarButtonItemsForPhotoViewCtrl:(UIViewController *)photoViewCtrl;
 
 @end
 
