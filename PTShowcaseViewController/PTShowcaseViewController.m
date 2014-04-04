@@ -258,12 +258,12 @@
                 [self validateBarButtonItems:self.additionalBarButtonItems];
                 
                 // force re-setting of bar button properties
-                [browser setCurrentPhotoIndex:self.selectedItemPosition];
-                
                 [barButtons addObjectsFromArray:self.additionalBarButtonItems];
             }
             
             browser.navigationItem.rightBarButtonItems = barButtons;
+            
+            [browser setCurrentPhotoIndex:relativeIndex];
             
             // TODO zoom in/out (just like in Photos.app in the iPad)
             [self presentViewController:navCtrl animated:YES completion:NULL];
@@ -387,7 +387,6 @@
 //}
 
 - (void)photoBrowser:(MWPhotoBrowser *)photoBrowser didDisplayPhotoAtIndex:(NSUInteger)index {
-    NSLog(@"Did start viewing photo at index %lu", (unsigned long)index);
     
     self.selectedNestedItemPosition = index;
     
