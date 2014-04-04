@@ -235,6 +235,8 @@
             // Create browser
             MWPhotoBrowser *browser = [[MWPhotoBrowser alloc] initWithDelegate:self];
             browser.displayActionButton = YES;
+            browser.enableGrid = NO;
+            browser.alwaysShowControls = YES;
             browser.navigationToolbarType = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone
             ? MWPhotoBrowserNavigationToolbarTypeButtons
             : MWPhotoBrowserNavigationToolbarTypeScrubber;
@@ -244,9 +246,6 @@
 #endif
             
             self.selectedNestedItemPosition = relativeIndex;
-            
-            UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:browser];
-            navCtrl.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
             
             NSMutableArray *barButtons = [[NSMutableArray alloc] init];
         
@@ -261,12 +260,12 @@
                 [barButtons addObjectsFromArray:self.additionalBarButtonItems];
             }
             
-            browser.navigationItem.rightBarButtonItems = barButtons;
-            
             [browser setCurrentPhotoIndex:relativeIndex];
             
             // TODO zoom in/out (just like in Photos.app in the iPad)
-            [self presentViewController:navCtrl animated:YES completion:NULL];
+            [self presentViewController:browser animated:YES completion:^{
+                browser.navigationItem.rightBarButtonItems = barButtons;
+            }];
             
             break;
         }
