@@ -235,11 +235,9 @@
             // Create browser
             MWPhotoBrowser *browser = [[MWPhotoBrowser alloc] initWithDelegate:self];
             browser.displayActionButton = YES;
-            browser.enableGrid = NO;
+            browser.enableGrid = YES;
             browser.alwaysShowControls = YES;
-            browser.navigationToolbarType = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone
-            ? MWPhotoBrowserNavigationToolbarTypeButtons
-            : MWPhotoBrowserNavigationToolbarTypeScrubber;
+            browser.displayNavArrows = YES;
             browser.zoomPhotosToFill = YES;
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
             browser.wantsFullScreenLayout = YES;
