@@ -381,32 +381,20 @@
     return nil;
 }
 
-//- (void)photoBrowser:(MWPhotoBrowser *)photoBrowser actionButtonPressedForPhotoAtIndex:(NSUInteger)index {
-//    NSLog(@"ACTION!");
-//}
-
 - (void)photoBrowser:(MWPhotoBrowser *)photoBrowser didDisplayPhotoAtIndex:(NSUInteger)index {
     
     self.selectedNestedItemPosition = index;
+    NSInteger relativeIndex = [self.showcaseView indexForItemAtRelativeIndex:self.selectedNestedItemPosition withContentType:PTContentTypeImage];
     
     for (UIBarButtonItem *item in self.additionalBarButtonItems) {
         if ([item isKindOfClass:[PTBarButtonItem class]]) {
             PTBarButtonItem *button = (PTBarButtonItem *)item;
-            button.index = [self.showcaseView indexForItemAtRelativeIndex:self.selectedNestedItemPosition withContentType:PTContentTypeImage];
+            button.index = relativeIndex;
             button.showcaseUniqueName = [self.showcaseView uniqueName];
         }
     }
-}
-
-- (void)photoBrowserDidFinishModalPresentation:(MWPhotoBrowser *)photoBrowser {
-    // If we subscribe to this method we must dismiss the view controller ourselves
-    NSLog(@"Did finish modal presentation");
-
-    NSInteger relativeIndex = photoBrowser.currentIndex;
-    NSInteger index = [self.showcaseView indexForItemAtRelativeIndex:relativeIndex withContentType:PTContentTypeImage];
-    [self.showcaseView scrollToObjectAtIndex:index atScrollPosition:GMGridViewScrollPositionTop animated:NO];
     
-    [self dismissViewControllerAnimated:YES completion:NULL];
+    [self.showcaseView scrollToObjectAtIndex:relativeIndex atScrollPosition:GMGridViewScrollPositionTop animated:NO];
 }
 
 #pragma mark - PTShowcaseViewDataSource
