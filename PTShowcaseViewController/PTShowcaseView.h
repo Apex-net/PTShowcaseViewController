@@ -17,7 +17,6 @@
 #import "GMGridView.h"
 
 @class PTShowcaseView;
-@class PTImageAlbumViewController;
 
 typedef enum {
     PTItemOrientationPortrait,
