@@ -261,10 +261,9 @@
             [browser setCurrentPhotoIndex:relativeIndex];
             
             // TODO zoom in/out (just like in Photos.app in the iPad)
-            [self presentViewController:browser animated:YES completion:^{
-                browser.navigationItem.rightBarButtonItems = barButtons;
-            }];
-            
+            [self presentViewController:browser animated:YES completion:NULL];
+            browser.navigationItem.rightBarButtonItems = barButtons;
+
             break;
         }
             
@@ -393,6 +392,12 @@
     }
     
     [self.showcaseView scrollToObjectAtIndex:relativeIndex atScrollPosition:GMGridViewScrollPositionTop animated:NO];
+}
+
+- (NSString *)photoBrowser:(MWPhotoBrowser *)photoBrowser titleForPhotoAtIndex:(NSUInteger)index
+{
+    // No title by default. Subclass this method for custom title.
+    return nil;
 }
 
 #pragma mark - PTShowcaseViewDataSource
