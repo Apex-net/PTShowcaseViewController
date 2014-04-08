@@ -237,7 +237,8 @@
             browser.displayActionButton = YES;
             browser.enableGrid = YES;
             browser.alwaysShowControls = YES;
-            browser.displayNavArrows = YES;
+//            browser.displayNavArrows = YES;
+            browser.navigationToolbarType = MWPhotoBrowserNavigationToolbarTypeScrubber;
             browser.zoomPhotosToFill = YES;
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
             browser.wantsFullScreenLayout = YES;
@@ -356,11 +357,10 @@
 }
 
 - (id <MWPhoto>)photoBrowser:(MWPhotoBrowser *)photoBrowser photoAtIndex:(NSUInteger)index {
-    index = [self.showcaseView indexForItemAtRelativeIndex:index withContentType:PTContentTypeImage];
+    NSUInteger relativeIndex = [self.showcaseView indexForItemAtRelativeIndex:index withContentType:PTContentTypeImage];
     if (index < [self.showcaseView.imageItems count]) {
-#warning TODO add caching, so images are not re-instaced every time
-        MWPhoto *photo = [MWPhoto photoWithURL:[NSURL fileURLWithPath:[self.showcaseView pathForItemAtIndex:index]]];
-        photo.caption = [self.showcaseView detailTextForItemAtIndex:index];
+        MWPhoto *photo = [MWPhoto photoWithURL:[NSURL fileURLWithPath:[self.showcaseView pathForItemAtIndex:relativeIndex]]];
+        photo.caption = [self.showcaseView detailTextForItemAtIndex:relativeIndex];
         return photo;
     }
 
@@ -368,10 +368,9 @@
 }
 
 - (id <MWPhoto>)photoBrowser:(MWPhotoBrowser *)photoBrowser thumbPhotoAtIndex:(NSUInteger)index {
-    index = [self.showcaseView indexForItemAtRelativeIndex:index withContentType:PTContentTypeImage];
+    NSUInteger relativeIndex = [self.showcaseView indexForItemAtRelativeIndex:index withContentType:PTContentTypeImage];
     if (index < [self.showcaseView.imageItems count]) {
-#warning TODO add caching, so images are not re-instaced every time
-        MWPhoto *photo = [MWPhoto photoWithURL:[NSURL fileURLWithPath:[self.showcaseView sourceForThumbnailImageOfItemAtIndex:index]]];
+        MWPhoto *photo = [MWPhoto photoWithURL:[NSURL fileURLWithPath:[self.showcaseView sourceForThumbnailImageOfItemAtIndex:relativeIndex]]];
         return photo;
     }
     
