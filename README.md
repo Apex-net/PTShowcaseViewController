@@ -1,13 +1,16 @@
 How To Get
 ==========
 
-### 1. Install dependencies: [PTImageAlbumViewController](https://github.com/exalted/PTImageAlbumViewController) and  [Nimbus](https://github.com/jverkoey/nimbus)
+### 1. Install dependencies: [MWPhotoBrowser](https://github.com/Apex-net/MWPhotoBrowser) and  [Nimbus](https://github.com/jverkoey/nimbus)
 
-If your project uses [CocoaPods](http://cocoapods.org) to manage its dependencies, easiest way to install [Nimbus](https://github.com/jverkoey/nimbus) is to add the following in your `Podfile`:
+If your project uses [CocoaPods](http://cocoapods.org) to manage its dependencies, easiest way to install [Nimbus](https://github.com/jverkoey/nimbus) and [MWPhotoBrowser](https://github.com/Apex-net/MWPhotoBrowser) is to add the following in your `Podfile`:
 
 ```ruby
 pod 'Nimbus/NetworkImage', :podspec => 'https://gist.github.com/exalted/7655606/raw/ce27220c457984ecd30fb800503b4c299159ace0/Nimbus.podspec'
+pod 'MWPhotoBrowser', :git => 'https://github.com/Apex-net/MWPhotoBrowser.git'
 ```
+
+For 
 
 ### 2. Copy `PTShowcaseViewController` directory into your own project
 
@@ -23,6 +26,7 @@ git submodule add https://github.com/exalted/PTShowcaseViewController.git
 #import <Nimbus/NimbusCore.h>
 #import <Nimbus/NimbusPhotos.h>
 #import <Nimbus/NimbusNetworkImage.h>
+#import <MWPhotoBrowser/MWPhotoBrowser.h>
 ```
 
 ### 4. Build & run
