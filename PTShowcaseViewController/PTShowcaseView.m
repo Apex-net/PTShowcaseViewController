@@ -19,7 +19,7 @@
 #import <ImageIO/ImageIO.h>
 
 #import "GMGridView.h"
-#import "NINetworkImageView.h"
+#import "SDImageCache.h"
 
 typedef enum {
     PTShowcaseTagThumbnail  = 10,
@@ -58,7 +58,7 @@ typedef enum {
 
 #pragma mark - Video thumbnail
 
-@interface PTVideoThumbnailImageView : NINetworkImageView
+@interface PTVideoThumbnailImageView : UIImageView
 
 @property (assign, nonatomic) PTItemOrientation orientation;
 
@@ -88,15 +88,11 @@ typedef enum {
     return maskedImage;
 }
 
-- (void)networkImageViewDidLoadImage:(UIImage *)image {
-    self.image = [PTVideoThumbnailImageView applyMask:image forOrientation:self.orientation];
-}
-
 @end
 
 #pragma mark - Pdf thumbnail
 
-@interface PTPdfThumbnailImageView : NINetworkImageView
+@interface PTPdfThumbnailImageView : UIImageView
 
 @property (assign, nonatomic) PTItemOrientation orientation;
 
@@ -124,10 +120,6 @@ typedef enum {
     CGImageRelease(maskedImageRef);
 
     return maskedImage;
-}
-
-- (void)networkImageViewDidLoadImage:(UIImage *)image {
-    self.image = [PTPdfThumbnailImageView applyMask:image forOrientation:self.orientation];
 }
 
 @end
@@ -460,6 +452,9 @@ typedef enum {
 {
     self.cachedData = nil;
     self.imageItems = nil;
+    
+    [[SDImageCache sharedImageCache] clearMemory]; // clear memory
+
     [super reloadData];
 }
 
@@ -577,16 +572,19 @@ typedef enum {
     cell.contentView = view;
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        
         // Placeholder
-
+        
         UIImage *placeholderImage = [self contentType:PTContentTypeGroup initialImageForOrientation:orientation];
         CGRect placeholderImageNameImageViewFrame = CGRectMake(2.5, 2.5, 75.0, 75.0);
 
         UIImageView *placeholderImageView = [[UIImageView alloc] initWithFrame:placeholderImageNameImageViewFrame];
+        placeholderImageView.clipsToBounds = YES;
         placeholderImageView.image = placeholderImage;
         [cell.contentView addSubview:placeholderImageView];
     }
     else {
+        
         // Back Image
 
         NSString *backImageName = [NSString stringWithFormat:@"PTShowcase.bundle/%@-%@.png", @"group",
@@ -594,6 +592,7 @@ typedef enum {
         CGRect backImageViewFrame = CGRectMake(0.0, 0.0, 256.0, 256.0);
 
         UIImageView *backImageView = [[UIImageView alloc] initWithFrame:backImageViewFrame];
+        backImageView.clipsToBounds = YES;
         backImageView.image = [UIImage imageNamed:backImageName];
         [cell.contentView addSubview:backImageView];
 
@@ -603,10 +602,11 @@ typedef enum {
         CGRect loadingImageViewFrame = orientation == PTItemOrientationPortrait
         ? CGRectMake(60.0, 28.0, 135.0, 180.0)
         : CGRectMake(40.0, 50.0, 180.0, 135.0);
-
-        NINetworkImageView *thumbnailView = [[NINetworkImageView alloc] initWithFrame:loadingImageViewFrame];
+        
+        UIImageView *thumbnailView = [[UIImageView alloc] initWithFrame:loadingImageViewFrame];
+        thumbnailView.clipsToBounds = YES;
+        thumbnailView.image = loadingImage;
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = loadingImage;
         [cell.contentView addSubview:thumbnailView];
     }
 
@@ -623,56 +623,44 @@ typedef enum {
     cell.contentView = view;
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        // Back Image
 
-        CGRect backImageViewFrame = CGRectMake(2.5, 2.5, 75.0, 75.0);
-
-        UIImageView *backImageView = [[UIImageView alloc] initWithFrame:backImageViewFrame];
-        backImageView.image = [UIImage imageNamed:@"PTShowcase.bundle/image.png"];
-        [cell.contentView addSubview:backImageView];
+        CGRect imageViewFrame = CGRectMake(2.5, 2.5, 75.0, 75.0);
 
         // Thumbnail
-
+        
         UIImage *initialImage = [self contentType:PTContentTypeImage initialImageForOrientation:orientation];
-
-        NINetworkImageView *thumbnailView = [[NINetworkImageView alloc] initWithFrame:backImageViewFrame];
+        UIImageView *thumbnailView = [[UIImageView alloc] initWithFrame:imageViewFrame];
+        thumbnailView.clipsToBounds = YES;
+        thumbnailView.image = initialImage;
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = initialImage;
         [cell.contentView addSubview:thumbnailView];
 
         // Overlap
-
-        UIImageView *overlapView = [[UIImageView alloc] initWithFrame:backImageViewFrame];
+        
+        UIImageView *overlapView = [[UIImageView alloc] initWithFrame:imageViewFrame];
+        overlapView.clipsToBounds = YES;
         overlapView.image = [UIImage imageNamed:@"PTShowcase.bundle/image-overlap.png"];
         [cell.contentView addSubview:overlapView];
     }
     else {
-        // Back Image
 
-        NSString *backImageName = [NSString stringWithFormat:@"PTShowcase.bundle/%@-%@.png", @"image",
-                                   orientation == PTItemOrientationPortrait ? @"portrait" : @"landscape"];
-        CGRect backImageViewFrame = orientation == PTItemOrientationPortrait
+        CGRect imageViewFrame = orientation == PTItemOrientationPortrait
         ? CGRectMake(38.0, 8.0, 180.0, 240.0)
         : CGRectMake(8.0, 28.0, 240.0, 180.0);
 
-        UIImageView *backImageView = [[UIImageView alloc] initWithFrame:backImageViewFrame];
-        backImageView.image = [UIImage imageNamed:backImageName];
-        [cell.contentView addSubview:backImageView];
-
         // Thumbnail
-
         UIImage *initialImage = [self contentType:PTContentTypeImage initialImageForOrientation:orientation];
-
-        NINetworkImageView *thumbnailView = [[NINetworkImageView alloc] initWithFrame:backImageViewFrame];
+        UIImageView *thumbnailView = [[UIImageView alloc] initWithFrame:imageViewFrame];
+        thumbnailView.clipsToBounds = YES;
+        thumbnailView.image = initialImage;
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = initialImage;
         [cell.contentView addSubview:thumbnailView];
 
         // Overlap
-
         NSString *overlapImageName = [NSString stringWithFormat:@"PTShowcase.bundle/%@-%@.png", @"image-overlap",
                                       orientation == PTItemOrientationPortrait ? @"portrait" : @"landscape"];
-        UIImageView *overlapView = [[UIImageView alloc] initWithFrame:backImageViewFrame];
+        UIImageView *overlapView = [[UIImageView alloc] initWithFrame:imageViewFrame];
+        overlapView.clipsToBounds = YES;
         overlapView.image = [UIImage imageNamed:overlapImageName];
         [cell.contentView addSubview:overlapView];
     }
@@ -690,6 +678,7 @@ typedef enum {
     cell.contentView = view;
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        
         // Thumbnail
 
         UIImage *initialImage = [self contentType:PTContentTypeVideo initialImageForOrientation:orientation];
@@ -697,16 +686,18 @@ typedef enum {
 
         PTVideoThumbnailImageView *thumbnailView = [[PTVideoThumbnailImageView alloc] initWithFrame:loadingImageViewFrame];
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = initialImage;
+        thumbnailView.image = initialImage;
         [cell.contentView addSubview:thumbnailView];
 
         // Overlap
 
         UIImageView *overlapView = [[UIImageView alloc] initWithFrame:loadingImageViewFrame];
+        overlapView.clipsToBounds = YES;
         overlapView.image = [UIImage imageNamed:@"PTShowcase.bundle/video-overlap.png"];
         [cell.contentView addSubview:overlapView];
     }
     else {
+        
         // Thumbnail
 
         UIImage *initialImage = [self contentType:PTContentTypeVideo initialImageForOrientation:orientation];
@@ -714,12 +705,13 @@ typedef enum {
 
         PTVideoThumbnailImageView *thumbnailView = [[PTVideoThumbnailImageView alloc] initWithFrame:loadingImageViewFrame];
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = initialImage;
+        thumbnailView.image = initialImage;
         [cell.contentView addSubview:thumbnailView];
 
         // Overlap
 
         UIImageView *overlapView = [[UIImageView alloc] initWithFrame:loadingImageViewFrame];
+        overlapView.clipsToBounds = YES;
         overlapView.image = [UIImage imageNamed:@"PTShowcase.bundle/video-overlap.png"];
         [cell.contentView addSubview:overlapView];
     }
@@ -737,6 +729,7 @@ typedef enum {
     cell.contentView = view;
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        
         // Thumbnail
 
         UIImage *initialImage = [self contentType:PTContentTypePdf initialImageForOrientation:orientation];
@@ -744,12 +737,13 @@ typedef enum {
 
         PTPdfThumbnailImageView *thumbnailView = [[PTPdfThumbnailImageView alloc] initWithFrame:loadingImageViewFrame];
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = initialImage;
+        thumbnailView.image = initialImage;
         [cell.contentView addSubview:thumbnailView];
 
         // Overlap
 
         UIImageView *overlapView = [[UIImageView alloc] initWithFrame:loadingImageViewFrame];
+        overlapView.clipsToBounds = YES;
         overlapView.image = [UIImage imageNamed:@"PTShowcase.bundle/document-overlap.png"];
         [cell.contentView addSubview:overlapView];
     }
@@ -761,6 +755,7 @@ typedef enum {
         CGRect backImageViewFrame = CGRectMake(0.0, 0.0, 256.0, 256.0);
 
         UIImageView *backImageView = [[UIImageView alloc] initWithFrame:backImageViewFrame];
+        backImageView.clipsToBounds = YES;
         backImageView.image = [UIImage imageNamed:backImageName];
         [cell.contentView addSubview:backImageView];
 
@@ -770,10 +765,12 @@ typedef enum {
         CGRect loadingImageViewFrame = orientation == PTItemOrientationPortrait
         ? CGRectMake(60.0, 38.0, 135.0, 180.0)
         : CGRectMake(38.0, 61.0, 180.0, 135.0);
-
-        NINetworkImageView *thumbnailView = [[NINetworkImageView alloc] initWithFrame:loadingImageViewFrame];
+        
+        // Thumbnail
+        PTPdfThumbnailImageView *thumbnailView = [[PTPdfThumbnailImageView alloc] initWithFrame:loadingImageViewFrame];
+        thumbnailView.clipsToBounds = YES;
+        thumbnailView.image = initialImage;
         thumbnailView.tag = PTShowcaseTagThumbnail;
-        thumbnailView.initialImage = initialImage;
         [cell.contentView addSubview:thumbnailView];
     }
 
@@ -852,8 +849,6 @@ typedef enum {
             break;
     }
     
-    
-    
     return initialImage;
     
 }
@@ -885,7 +880,7 @@ typedef enum {
     NSString *detailText = [self detailTextForItemAtIndex:index];
     
     GMGridViewCell *cell = [self GMGridView:gridView reusableCellForContentType:contentType withOrientation:orientation];
-    NINetworkImageView *thumbnailView = (NINetworkImageView *)[cell.contentView viewWithTag:PTShowcaseTagThumbnail];
+    UIImageView *thumbnailView = (UIImageView *)[cell.contentView viewWithTag:PTShowcaseTagThumbnail];
     thumbnailView.contentMode = UIViewContentModeScaleAspectFill;
 
     UIImage *initialImage = [self contentType:contentType initialImageForOrientation:orientation];
@@ -894,14 +889,10 @@ typedef enum {
     }
     
     if (thumbnailImageSource != nil) {
-
-        if (!CGSizeEqualToSize(size, CGSizeZero)) {
-            NSArray *minSize = self.itemUIProperties[contentType][[[UIDevice currentDevice] userInterfaceIdiom]][orientation];
-            if (size.width < [minSize[0] floatValue] || size.height < [minSize[1] floatValue]) {
-                thumbnailView.contentMode = UIViewContentModeScaleAspectFit;
-            }
-        }
-        [thumbnailView setPathToNetworkImage:thumbnailImageSource];
+        MWPhoto *p = [MWPhoto photoWithURL:[NSURL fileURLWithPath:thumbnailImageSource]];
+        p.index = index;
+        p.parentView = cell;
+        [p loadUnderlyingImageAndNotify];
     }
 
     UILabel *textLabel = (UILabel *)[cell.contentView viewWithTag:PTShowcaseTagText];
@@ -920,6 +911,32 @@ typedef enum {
 //    [detailTextLabel setBackgroundColor:((index % 2 == 0) ? [UIColor brownColor] : [UIColor yellowColor])];
 
     return cell;
+}
+
+#pragma mark - MWPhoto notification
+
+- (void)handleMWPhotoLoadingDidEndNotification:(NSNotification *)notification {
+    MWPhoto *photo = [notification object];
+    if ([photo underlyingImage]) {
+        
+        // Successful load
+        GMGridViewCell *cell = (GMGridViewCell *)photo.parentView;
+        UIImageView *imageView = (UIImageView *)[cell viewWithTag:PTShowcaseTagThumbnail];
+        
+        imageView.contentMode = UIViewContentModeScaleAspectFill;
+        imageView.clipsToBounds = YES;
+        
+        if ([[cell viewWithTag:PTShowcaseTagThumbnail] isKindOfClass:[PTPdfThumbnailImageView class]] &&
+            [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+            imageView.image = [PTPdfThumbnailImageView applyMask:photo.underlyingImage forOrientation:[self orientationForItemAtIndex:photo.index]];
+        }
+        else if ([[cell viewWithTag:PTShowcaseTagThumbnail] isKindOfClass:[PTVideoThumbnailImageView class]]) {
+            imageView.image = [PTVideoThumbnailImageView applyMask:photo.underlyingImage forOrientation:[self orientationForItemAtIndex:photo.index]];
+        }
+        else {
+            imageView.image = photo.underlyingImage;
+        }
+    }
 }
 
 @end

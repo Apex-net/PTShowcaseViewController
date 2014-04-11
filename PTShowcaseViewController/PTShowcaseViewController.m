@@ -17,6 +17,7 @@
 #import "PTShowcaseViewController.h"
 
 #import "PTBarButtonItem.h"
+#import "SDImageCache.h"
 
 #import <MediaPlayer/MediaPlayer.h>
 
@@ -139,13 +140,33 @@
     self.selectedItemPosition = 0;
     self.selectedNestedItemPosition = 0;
     self.showcaseView.maxSharingFileSize = self.maxSharingFileSize;
+    
 }
 
 - (void)viewDidUnload
 {
     [super viewDidUnload];
     
+    [[SDImageCache sharedImageCache] clearMemory]; // clear memory
+    
     self.showcaseView = nil;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self.showcaseView
+                                             selector:@selector(handleMWPhotoLoadingDidEndNotification:)
+                                                 name:MWPHOTO_LOADING_DID_END_NOTIFICATION
+                                               object:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self.showcaseView name:MWPHOTO_LOADING_DID_END_NOTIFICATION object:nil];
 }
 
 /*
