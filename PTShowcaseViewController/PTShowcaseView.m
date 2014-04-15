@@ -603,6 +603,14 @@ typedef enum {
         ? CGRectMake(60.0, 28.0, 135.0, 180.0)
         : CGRectMake(40.0, 50.0, 180.0, 135.0);
         
+        if (([UIScreen mainScreen].scale == 2.0) &&
+            [[UIScreen mainScreen] respondsToSelector:@selector(displayLinkWithTarget:selector:)]) {
+            loadingImageViewFrame = CGRectMake(loadingImageViewFrame.origin.x,
+                                         loadingImageViewFrame.origin.y + 5,
+                                         loadingImageViewFrame.size.width,
+                                         loadingImageViewFrame.size.height);
+        }
+        
         UIImageView *thumbnailView = [[UIImageView alloc] initWithFrame:loadingImageViewFrame];
         thumbnailView.clipsToBounds = YES;
         thumbnailView.image = loadingImage;
@@ -922,16 +930,19 @@ typedef enum {
         // Successful load
         GMGridViewCell *cell = (GMGridViewCell *)photo.parentView;
         UIImageView *imageView = (UIImageView *)[cell viewWithTag:PTShowcaseTagThumbnail];
-        
         imageView.contentMode = UIViewContentModeScaleAspectFill;
         imageView.clipsToBounds = YES;
         
         if ([[cell viewWithTag:PTShowcaseTagThumbnail] isKindOfClass:[PTPdfThumbnailImageView class]] &&
             [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-            imageView.image = [PTPdfThumbnailImageView applyMask:photo.underlyingImage forOrientation:[self orientationForItemAtIndex:photo.index]];
+            
+            imageView.image = [PTPdfThumbnailImageView applyMask:photo.underlyingImage
+                                                  forOrientation:[self orientationForItemAtIndex:photo.index]];
         }
         else if ([[cell viewWithTag:PTShowcaseTagThumbnail] isKindOfClass:[PTVideoThumbnailImageView class]]) {
-            imageView.image = [PTVideoThumbnailImageView applyMask:photo.underlyingImage forOrientation:[self orientationForItemAtIndex:photo.index]];
+            
+            imageView.image = [PTVideoThumbnailImageView applyMask:photo.underlyingImage
+                                                    forOrientation:[self orientationForItemAtIndex:photo.index]];
         }
         else {
             imageView.image = photo.underlyingImage;
