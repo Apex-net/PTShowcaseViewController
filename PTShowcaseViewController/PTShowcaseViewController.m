@@ -33,6 +33,8 @@
 
 @interface PTShowcaseView () <GMGridViewDataSource>
 
+- (void)handleMWPhotoLoadingDidEndNotification:(NSNotification *)notification;
+
 @end
 
 @interface PTShowcaseViewController () <GMGridViewActionDelegate, MWPhotoBrowserDelegate,

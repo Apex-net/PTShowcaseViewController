@@ -30,6 +30,7 @@
 		50FC0D2614E3D44300F28648 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 50FC0D2514E3D44300F28648 /* main.m */; };
 		50FC0D2A14E3D44300F28648 /* PTAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 50FC0D2914E3D44300F28648 /* PTAppDelegate.m */; };
 		5708C2861847B59000D150A0 /* PTBarButtonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 5708C2851847B59000D150A0 /* PTBarButtonItem.m */; };
+		578B6B4A18FD2A1E00D74183 /* PT_NIPaths.m in Sources */ = {isa = PBXBuildFile; fileRef = 578B6B4918FD2A1E00D74183 /* PT_NIPaths.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +65,8 @@
 		50FC0D2914E3D44300F28648 /* PTAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PTAppDelegate.m; sourceTree = "<group>"; };
 		5708C2841847B59000D150A0 /* PTBarButtonItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTBarButtonItem.h; sourceTree = "<group>"; };
 		5708C2851847B59000D150A0 /* PTBarButtonItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTBarButtonItem.m; sourceTree = "<group>"; };
+		578B6B4818FD2A1E00D74183 /* PT_NIPaths.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PT_NIPaths.h; sourceTree = "<group>"; };
+		578B6B4918FD2A1E00D74183 /* PT_NIPaths.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PT_NIPaths.m; sourceTree = "<group>"; };
 		581873E944F84A2DAC74BB81 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 		C8A602895C9445788B0A0957 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -109,6 +112,8 @@
 				5093F24D14E532F1004DC805 /* PTShowcaseViewController.m */,
 				5708C2841847B59000D150A0 /* PTBarButtonItem.h */,
 				5708C2851847B59000D150A0 /* PTBarButtonItem.m */,
+				578B6B4818FD2A1E00D74183 /* PT_NIPaths.h */,
+				578B6B4918FD2A1E00D74183 /* PT_NIPaths.m */,
 			);
 			name = PTShowcaseViewController;
 			path = ../../PTShowcaseViewController;
@@ -289,6 +294,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				578B6B4A18FD2A1E00D74183 /* PT_NIPaths.m in Sources */,
 				50FC0D2614E3D44300F28648 /* main.m in Sources */,
 				50FC0D2A14E3D44300F28648 /* PTAppDelegate.m in Sources */,
 				5093F24E14E532F1004DC805 /* PTShowcaseViewController.m in Sources */,

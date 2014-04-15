@@ -16,6 +16,8 @@
 
 #import "PTDemoViewController.h"
 
+#import "PT_NIPaths.h"
+
 @interface PTDemoViewController ()
 
 @property (retain, nonatomic, readonly) NSArray *demoItems;

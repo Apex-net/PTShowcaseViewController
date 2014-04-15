@@ -875,7 +875,6 @@ typedef enum {
     PTItemOrientation orientation = [self orientationForItemAtIndex:index];
     NSString *thumbnailImageSource = [self sourceForThumbnailImageOfItemAtIndex:index];
 
-    CGSize size = [self sizeForThumbnailImageOfItemAtIndex:index];
     NSString *text = [self textForItemAtIndex:index];
     NSString *detailText = [self detailTextForItemAtIndex:index];
     
@@ -915,7 +914,8 @@ typedef enum {
 
 #pragma mark - MWPhoto notification
 
-- (void)handleMWPhotoLoadingDidEndNotification:(NSNotification *)notification {
+- (void)handleMWPhotoLoadingDidEndNotification:(NSNotification *)notification
+{
     MWPhoto *photo = [notification object];
     if ([photo underlyingImage]) {
         

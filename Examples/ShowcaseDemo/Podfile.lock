@@ -7,14 +7,6 @@ PODS:
     - MBProgressHUD (~> 0.8)
     - PSTCollectionView (~> 1.2)
     - SDWebImage (~> 3.5.4)
-  - Nimbus/Core (0.9.3-arc-ios7)
-  - Nimbus/NetworkImage (0.9.3-arc-ios7):
-    - Nimbus/Core
-  - Nimbus/PagingScrollView (0.9.3-arc-ios7):
-    - Nimbus/Core
-  - Nimbus/Photos (0.9.3-arc-ios7):
-    - Nimbus/Core
-    - Nimbus/PagingScrollView
   - PSTCollectionView (1.2.0)
   - SDURLCache (1.2)
   - SDWebImage (3.5.4):
@@ -24,22 +16,17 @@ PODS:
 DEPENDENCIES:
   - GMGridView (~> 1.1.1)
   - MWPhotoBrowser (from `https://github.com/Apex-net/MWPhotoBrowser.git`)
-  - Nimbus/NetworkImage (from `https://gist.github.com/exalted/7655606/raw/ce27220c457984ecd30fb800503b4c299159ace0/Nimbus.podspec`)
-  - Nimbus/Photos (from `https://gist.github.com/exalted/7655606/raw/ce27220c457984ecd30fb800503b4c299159ace0/Nimbus.podspec`)
   - SDURLCache (~> 1.2)
 
 EXTERNAL SOURCES:
   MWPhotoBrowser:
     :git: https://github.com/Apex-net/MWPhotoBrowser.git
-  Nimbus:
-    :podspec: https://gist.github.com/exalted/7655606/raw/ce27220c457984ecd30fb800503b4c299159ace0/Nimbus.podspec
 
 SPEC CHECKSUMS:
   DACircularProgress: 659d6fd11b5fc099c13ba9350239d9dca324916a
   GMGridView: a17a31f010990eb8f802abb4cab50e6e03e993ea
   MBProgressHUD: 2bbc6f470111daf7f3eaa4eb12b8cbf01c4c0622
   MWPhotoBrowser: b85e89fcf0575062f32c472d389265dce1f068e1
-  Nimbus: 3b1be31a57a70bcbeafda5ee403e7e5892ba516d
   PSTCollectionView: fb2ad2790c6efa306b2caf10315b2c1464d1f5c6
   SDURLCache: b70522599f525127b9417f21ded4c9ba808e8ab9
   SDWebImage: 1a62010700adbba823b621fc217906739dbf6aa5
