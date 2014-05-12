@@ -30,6 +30,18 @@ typedef enum {
 ////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Private APIs
 ////////////////////////////////////////////////////////////////////////////////
+
+// Adding index to GMGridViewCell
+@interface PTGridViewCell : GMGridViewCell
+
+@property (nonatomic, assign) NSInteger index;
+
+@end
+
+@implementation PTGridViewCell
+@end
+
+
 @interface PTShowcaseView () <GMGridViewDataSource> {
     NSArray *_imageItems; // ivar used in custom setter method
     NSArray *_itemUIProperties;
@@ -44,7 +56,7 @@ typedef enum {
 @property (retain, nonatomic, readonly) NSArray *itemUIProperties;
 
 // Supported cells for content types
-- (GMGridViewCell *)GMGridView:(GMGridView *)gridView reusableCellForContentType:(PTContentType)contentType withOrientation:(PTItemOrientation)orientation;
+- (PTGridViewCell *)GMGridView:(GMGridView *)gridView reusableCellForContentType:(PTContentType)contentType withOrientation:(PTItemOrientation)orientation;
 
 - (GMGridViewCell *)reusableGroupCellWithReuseIdentifier:(NSString *)identifier forOrientation:(PTItemOrientation)orientation;
 - (GMGridViewCell *)reusableImageCellWithReuseIdentifier:(NSString *)identifier forOrientation:(PTItemOrientation)orientation;
@@ -564,7 +576,7 @@ typedef enum {
 
 - (GMGridViewCell *)reusableGroupCellWithReuseIdentifier:(NSString *)identifier forOrientation:(PTItemOrientation)orientation
 {
-    GMGridViewCell *cell = [[GMGridViewCell alloc] init];
+    PTGridViewCell *cell = [[PTGridViewCell alloc] init];
     cell.reuseIdentifier = identifier;
 
     CGSize size = [self GMGridView:self sizeForItemsInInterfaceOrientation:[[UIApplication sharedApplication] statusBarOrientation]];
@@ -623,7 +635,7 @@ typedef enum {
 
 - (GMGridViewCell *)reusableImageCellWithReuseIdentifier:(NSString *)identifier forOrientation:(PTItemOrientation)orientation
 {
-    GMGridViewCell *cell = [[GMGridViewCell alloc] init];
+    PTGridViewCell *cell = [[PTGridViewCell alloc] init];
     cell.reuseIdentifier = identifier;
 
     CGSize size = [self GMGridView:self sizeForItemsInInterfaceOrientation:[[UIApplication sharedApplication] statusBarOrientation]];
@@ -678,7 +690,7 @@ typedef enum {
 
 - (GMGridViewCell *)reusableVideoCellWithReuseIdentifier:(NSString *)identifier forOrientation:(PTItemOrientation)orientation
 {
-    GMGridViewCell *cell = [[GMGridViewCell alloc] init];
+    PTGridViewCell *cell = [[PTGridViewCell alloc] init];
     cell.reuseIdentifier = identifier;
 
     CGSize size = [self GMGridView:self sizeForItemsInInterfaceOrientation:[[UIApplication sharedApplication] statusBarOrientation]];
@@ -729,7 +741,7 @@ typedef enum {
 
 - (GMGridViewCell *)reusablePdfCellWithReuseIdentifier:(NSString *)identifier forOrientation:(PTItemOrientation)orientation
 {
-    GMGridViewCell *cell = [[GMGridViewCell alloc] init];
+    PTGridViewCell *cell = [[PTGridViewCell alloc] init];
     cell.reuseIdentifier = identifier;
 
     CGSize size = [self GMGridView:self sizeForItemsInInterfaceOrientation:[[UIApplication sharedApplication] statusBarOrientation]];
@@ -886,7 +898,9 @@ typedef enum {
     NSString *text = [self textForItemAtIndex:index];
     NSString *detailText = [self detailTextForItemAtIndex:index];
     
-    GMGridViewCell *cell = [self GMGridView:gridView reusableCellForContentType:contentType withOrientation:orientation];
+    PTGridViewCell *cell = [self GMGridView:gridView reusableCellForContentType:contentType withOrientation:orientation];
+    cell.index = index;
+    
     UIImageView *thumbnailView = (UIImageView *)[cell.contentView viewWithTag:PTShowcaseTagThumbnail];
     thumbnailView.contentMode = UIViewContentModeScaleAspectFill;
 
@@ -925,10 +939,11 @@ typedef enum {
 - (void)handleMWPhotoLoadingDidEndNotification:(NSNotification *)notification
 {
     MWPhoto *photo = [notification object];
-    if ([photo underlyingImage]) {
+    PTGridViewCell *cell = (PTGridViewCell *)photo.parentView;
+    
+    if ([photo underlyingImage] && cell.index == photo.index) {
         
         // Successful load
-        GMGridViewCell *cell = (GMGridViewCell *)photo.parentView;
         UIImageView *imageView = (UIImageView *)[cell viewWithTag:PTShowcaseTagThumbnail];
         imageView.contentMode = UIViewContentModeScaleAspectFill;
         imageView.clipsToBounds = YES;
