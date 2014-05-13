@@ -40,7 +40,7 @@ typedef enum {
 
 - (void)showcaseView:(PTShowcaseView *)showcaseView didPrepareReusableThumbnailView:(UIView *)view forContentType:(PTContentType)contentType andOrientation:(PTItemOrientation)orientation;
 - (void)showcaseView:(PTShowcaseView *)showcaseView willDisplayThumbnailView:(UIView *)view forItemAtIndex:(NSInteger)index;
-- (void)showcaseView:(PTShowcaseView *)showcaseView fileWithPath:(NSString *)path exceededMaxFileSizeWithSize:(NSNumber *)fileSize errors:(NSError **)error;
+- (BOOL)showcaseView:(PTShowcaseView *)showcaseView fileWithPath:(NSString *)path exceededMaxFileSizeWithSize:(NSNumber *)fileSize errors:(NSError **)error;
 
 @end
 

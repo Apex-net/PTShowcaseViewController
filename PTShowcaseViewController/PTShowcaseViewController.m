@@ -512,8 +512,8 @@
     }
     
     PTContentType contentType = [self.showcaseView contentTypeForItemAtIndex:self.selectedItemPosition];    
-    NSString *text = nil;
-    NSString *url = nil;
+    NSString *text = @"";
+    NSString *url = @"";
     
     NSMutableArray *excludedActivities = [self.excludedActivityTypes mutableCopy];
     
