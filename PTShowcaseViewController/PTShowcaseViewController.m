@@ -410,6 +410,13 @@
             PTBarButtonItem *button = (PTBarButtonItem *)item;
             button.index = relativeIndex;
             button.showcaseUniqueName = [self.showcaseView uniqueName];
+            if ([self.showcaseView.showcaseDelegate respondsToSelector:@selector(showcaseView:enableButton:forPhotoAtIndex:)])
+                button.enabled = [self.showcaseView.showcaseDelegate showcaseView:self.showcaseView enableButton:button forPhotoAtIndex:relativeIndex];
+            else
+            {
+                button.enabled = YES;
+            }
+
         }
     }
     
