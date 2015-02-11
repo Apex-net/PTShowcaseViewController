@@ -38,7 +38,7 @@
 @end
 
 @interface PTShowcaseViewController () <GMGridViewActionDelegate, MWPhotoBrowserDelegate,
-    UIPopoverControllerDelegate, UIDocumentInteractionControllerDelegate>
+UIPopoverControllerDelegate, UIDocumentInteractionControllerDelegate>
 
 @property (strong, nonatomic) UIPopoverController *activityPopoverController;
 @property (strong, nonatomic) UIBarButtonItem *actionBarButtonItem;
@@ -104,6 +104,15 @@
     return self;
 }
 
+- (id)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        self.showcaseView = [[PTShowcaseView alloc] initWithUniqueName:nil];
+    }
+    return self;
+}
+
 #pragma mark - View lifecycle
 
 - (void)loadView
@@ -114,9 +123,7 @@
         // I'm too lazy! ;-)
         [super loadView];
     }
-    else {
-        self.view = self.showcaseView;
-    }
+    self.view = self.showcaseView;
 }
 
 - (void)viewDidLoad
@@ -134,7 +141,7 @@
     if (self.showcaseView.showcaseDataSource == nil) {
         self.showcaseView.showcaseDataSource = self;
     }
-
+    
     // Internal
     self.showcaseView.dataSource = self.showcaseView; // this will trigger 'reloadData' automatically
     self.showcaseView.actionDelegate = self;
@@ -245,7 +252,7 @@
             detailViewController.view.backgroundColor = self.view.backgroundColor;
             
             detailViewController.hidesBottomBarWhenPushed = self.hidesBottomBarInDetails;
-                        
+            
             [self.navigationController pushViewController:detailViewController animated:YES];
             
             break;
@@ -260,7 +267,7 @@
             browser.displayActionButton = YES;
             browser.enableGrid = YES;
             browser.alwaysShowControls = YES;
-//            browser.displayNavArrows = YES;
+            //            browser.displayNavArrows = YES;
             browser.navigationToolbarType = MWPhotoBrowserNavigationToolbarTypeScrubber;
             browser.zoomPhotosToFill = YES;
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
@@ -270,11 +277,11 @@
             self.selectedNestedItemPosition = relativeIndex;
             
             NSMutableArray *barButtons = [[NSMutableArray alloc] init];
-        
+            
             // additional buttons
             if ([self.showcaseView.showcaseDataSource respondsToSelector:@selector(showcaseView:additionalBarButtonItemsForPhotoViewCtrl:)]) {
                 self.additionalBarButtonItems = [self.showcaseView.showcaseDataSource showcaseView:self.showcaseView additionalBarButtonItemsForPhotoViewCtrl:browser];
-            
+                
                 // check buttons class
                 [self validateBarButtonItems:self.additionalBarButtonItems];
                 
@@ -287,7 +294,7 @@
             // TODO zoom in/out (just like in Photos.app in the iPad)
             [self presentViewController:browser animated:YES completion:NULL];
             browser.navigationItem.rightBarButtonItems = barButtons;
-
+            
             break;
         }
             
@@ -329,7 +336,7 @@
                 self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
                 [barButtons addObject:self.actionBarButtonItem];
             }
-                        
+            
             detailViewController.navigationItem.rightBarButtonItems = barButtons;
             
             // TODO zoom in/out (just like in Photos.app in the iPad)
@@ -357,15 +364,15 @@
                 url = [NSURL URLWithString:path];
             }
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
+            
             // Initialize Document Interaction Controller
             UIDocumentInteractionController *documentInteractionController = [UIDocumentInteractionController interactionControllerWithURL:url];
             documentInteractionController.name = text;
             documentInteractionController.delegate = self;
-                
+            
             // Preview PDF
             [documentInteractionController presentPreviewAnimated:YES];
-
+            
             break;
         }
             
@@ -386,7 +393,7 @@
         photo.caption = [self.showcaseView detailTextForItemAtIndex:relativeIndex];
         return photo;
     }
-
+    
     return nil;
 }
 
@@ -416,7 +423,7 @@
             {
                 button.enabled = YES;
             }
-
+            
         }
     }
     
@@ -518,7 +525,7 @@
         return;
     }
     
-    PTContentType contentType = [self.showcaseView contentTypeForItemAtIndex:self.selectedItemPosition];    
+    PTContentType contentType = [self.showcaseView contentTypeForItemAtIndex:self.selectedItemPosition];
     NSString *text = @"";
     NSString *url = @"";
     
@@ -549,7 +556,7 @@
                 url = [NSURL URLWithString:path];
             }
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
+            
             // check max filesize
             if ([self.showcaseView fileExceededMaxFileSize:path]) {
                 return;
@@ -568,7 +575,7 @@
             text = [self.showcaseView textForItemAtIndex:self.selectedItemPosition];
             
             // TODO remove duplicate
-            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>            
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // Check for file URLs.
             if ([path hasPrefix:@"/"]) {
                 // If the url starts with / then it's likely a file URL, so treat it accordingly.
@@ -616,7 +623,7 @@
                                                permittedArrowDirections:UIPopoverArrowDirectionUp
                                                                animated:YES];
     }
-
+    
 }
 
 #pragma mark - Private methods
