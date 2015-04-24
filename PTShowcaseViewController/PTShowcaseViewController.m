@@ -265,49 +265,38 @@ UIPopoverControllerDelegate, UIDocumentInteractionControllerDelegate>
             NSInteger relativeIndex = [self.showcaseView relativeIndexForItemAtIndex:position withContentType:contentType];
             
             // Create browser
-            // [!]MWPhotoBrowser *browser = [[MWPhotoBrowser alloc] initWithDelegate:self];
             PTPhotoBrowserViewController *browser = [[PTPhotoBrowserViewController alloc] initWithDelegate:self];
             browser.displayActionButton = YES;
             browser.enableGrid = YES;
             browser.alwaysShowControls = YES;
-            //            browser.displayNavArrows = YES;
             browser.navigationToolbarType = MWPhotoBrowserNavigationToolbarTypeScrubber;
             browser.zoomPhotosToFill = YES;
-#if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
-            browser.wantsFullScreenLayout = YES;
-#endif
             
             self.selectedNestedItemPosition = relativeIndex;
             
             NSMutableArray *barButtons = [[NSMutableArray alloc] init];
             
             // additional buttons
-            /* [!]
             if ([self.showcaseView.showcaseDataSource respondsToSelector:@selector(showcaseView:additionalBarButtonItemsForPhotoViewCtrl:)]) {
+
                 self.additionalBarButtonItems = [self.showcaseView.showcaseDataSource showcaseView:self.showcaseView additionalBarButtonItemsForPhotoViewCtrl:browser];
                 
                 // check buttons class
                 [self validateBarButtonItems:self.additionalBarButtonItems];
                 
-                // force re-setting of bar button properties
-                [barButtons addObjectsFromArray:self.additionalBarButtonItems];
+                // pass additional buttons
+                browser.additionalBarButtonItems = self.additionalBarButtonItems;
+
             }
-             */
             
+            // set current photo
             [browser setCurrentPhotoIndex:relativeIndex];
             
-            // TODO zoom in/out (just like in Photos.app in the iPad)
-
-            // [!]
+            // present browser controller
             UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:browser];
             UIBarButtonItem *dismissButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissDetailViewController)];
             browser.navigationItem.leftBarButtonItem = dismissButton;
-            //browser.navigationItem.rightBarButtonItems = barButtons;
             [self presentViewController:navCtrl animated:YES completion:NULL];
-            
-            //[self presentViewController:browser animated:YES completion:NULL];
-            //browser.navigationItem.rightBarButtonItems = nil;
-            //browser.navigationItem.rightBarButtonItem = nil;
             
             break;
         }

@@ -12,4 +12,6 @@
 
 @interface PTPhotoBrowserViewController : MWPhotoBrowser
 
+@property (strong, nonatomic) NSArray *additionalBarButtonItems;
+
 @end

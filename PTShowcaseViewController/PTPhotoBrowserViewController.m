@@ -18,12 +18,17 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
+    // UI adjustements
     if (self.navigationItem.rightBarButtonItem) {
         // remove right done button
         //UIBarButtonItem *dismissButton = self.navigationItem.rightBarButtonItem;
         self.navigationItem.rightBarButtonItem = nil;
     }
     
+    // Add additional buttons
+    if (self.additionalBarButtonItems) {
+        self.navigationItem.rightBarButtonItems = self.additionalBarButtonItems;
+    }
     
 }
 
