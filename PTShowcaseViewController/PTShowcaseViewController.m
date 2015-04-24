@@ -21,6 +21,8 @@
 
 #import <MediaPlayer/MediaPlayer.h>
 
+#import "PTPhotoBrowserViewController.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Private APIs
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +265,8 @@ UIPopoverControllerDelegate, UIDocumentInteractionControllerDelegate>
             NSInteger relativeIndex = [self.showcaseView relativeIndexForItemAtIndex:position withContentType:contentType];
             
             // Create browser
-            MWPhotoBrowser *browser = [[MWPhotoBrowser alloc] initWithDelegate:self];
+            // [!]MWPhotoBrowser *browser = [[MWPhotoBrowser alloc] initWithDelegate:self];
+            PTPhotoBrowserViewController *browser = [[PTPhotoBrowserViewController alloc] initWithDelegate:self];
             browser.displayActionButton = YES;
             browser.enableGrid = YES;
             browser.alwaysShowControls = YES;
@@ -279,6 +282,7 @@ UIPopoverControllerDelegate, UIDocumentInteractionControllerDelegate>
             NSMutableArray *barButtons = [[NSMutableArray alloc] init];
             
             // additional buttons
+            /* [!]
             if ([self.showcaseView.showcaseDataSource respondsToSelector:@selector(showcaseView:additionalBarButtonItemsForPhotoViewCtrl:)]) {
                 self.additionalBarButtonItems = [self.showcaseView.showcaseDataSource showcaseView:self.showcaseView additionalBarButtonItemsForPhotoViewCtrl:browser];
                 
@@ -288,12 +292,22 @@ UIPopoverControllerDelegate, UIDocumentInteractionControllerDelegate>
                 // force re-setting of bar button properties
                 [barButtons addObjectsFromArray:self.additionalBarButtonItems];
             }
+             */
             
             [browser setCurrentPhotoIndex:relativeIndex];
             
             // TODO zoom in/out (just like in Photos.app in the iPad)
-            [self presentViewController:browser animated:YES completion:NULL];
-            browser.navigationItem.rightBarButtonItems = barButtons;
+
+            // [!]
+            UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:browser];
+            UIBarButtonItem *dismissButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissDetailViewController)];
+            browser.navigationItem.leftBarButtonItem = dismissButton;
+            //browser.navigationItem.rightBarButtonItems = barButtons;
+            [self presentViewController:navCtrl animated:YES completion:NULL];
+            
+            //[self presentViewController:browser animated:YES completion:NULL];
+            //browser.navigationItem.rightBarButtonItems = nil;
+            //browser.navigationItem.rightBarButtonItem = nil;
             
             break;
         }
