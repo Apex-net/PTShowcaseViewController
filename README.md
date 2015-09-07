@@ -3,10 +3,11 @@ How To Get
 
 ### 1. Install dependencies: [MWPhotoBrowser](https://github.com/Apex-net/MWPhotoBrowser).
 
-If your project uses [CocoaPods](http://cocoapods.org) to manage its dependencies, easiest way to install [MWPhotoBrowser](https://github.com/Apex-net/MWPhotoBrowser) is to add the following in your `Podfile`:
+If your project uses [CocoaPods](http://cocoapods.org) to manage its dependencies, easiest way to install [MWPhotoBrowser](https://github.com/Apex-net/MWPhotoBrowser) and [PBJVideoPlayer](https://github.com/piemonte/PBJVideoPlayer) is to add the following in your `Podfile`:
 
 ```ruby
 pod 'MWPhotoBrowser', :git => 'https://github.com/Apex-net/MWPhotoBrowser.git'
+pod 'PBJVideoPlayer', '0.2.3'
 ```
 
 For 

@@ -23,6 +23,8 @@
 
 #import "PTPhotoBrowserViewController.h"
 
+#import "PBJVideoPlayerController.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Private APIs
 ////////////////////////////////////////////////////////////////////////////////
@@ -308,42 +310,44 @@ UIPopoverControllerDelegate, UIDocumentInteractionControllerDelegate>
             
             // TODO remove duplicate
             // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            NSURL *url = nil;
+            if (path != nil) {
+                
+                NSURL *url = nil;
             
-            // Check for file URLs.
-            if ([path hasPrefix:@"/"]) {
-                // If the url starts with / then it's likely a file URL, so treat it accordingly.
-                url = [NSURL fileURLWithPath:path];
-            }
-            else {
+                // Check for file URLs.
+                if ([path hasPrefix:@"/"]) {
+                    // If the url starts with / then it's likely a file URL, so treat it accordingly.
+                    url = [NSURL fileURLWithPath:path];
+                }
+                else {
                 // Otherwise we assume it's a regular URL.
-                url = [NSURL URLWithString:path];
+                    url = [NSURL URLWithString:path];
+                }
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                
+                PBJVideoPlayerController * videoPlayerController = [[PBJVideoPlayerController alloc]init];
+                videoPlayerController.delegate = self;
+                videoPlayerController.view.frame = self.view.bounds;
+                videoPlayerController.videoPath = path;
+                
+                UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:videoPlayerController];
+                
+                // button to close the movie player
+                UIBarButtonItem *dismissButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissDetailViewController)];
+                videoPlayerController.navigationItem.leftBarButtonItem = dismissButton;
+            
+                NSMutableArray *barButtons = [[NSMutableArray alloc] init];
+            
+                // button to share image
+                if (self.activityButtonEnabled) {
+                    self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
+                    [barButtons addObject:self.actionBarButtonItem];
+                }
+            
+                videoPlayerController.navigationItem.rightBarButtonItems = barButtons;
+                [self presentViewController:navCtrl animated:YES completion:nil];
+                // TODO zoom in/out (just like in Photos.app in the iPad)
             }
-            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            
-            MPMoviePlayerViewController *detailViewController = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
-            detailViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-            detailViewController.moviePlayer.controlStyle = MPMovieControlStyleDefault;
-            detailViewController.title = text;
-            
-            UINavigationController *navCtrl = [[UINavigationController alloc] initWithRootViewController:detailViewController];
-            
-            // button to close the movie player
-            UIBarButtonItem *dismissButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissDetailViewController)];
-            detailViewController.navigationItem.leftBarButtonItem = dismissButton;
-            
-            NSMutableArray *barButtons = [[NSMutableArray alloc] init];
-            
-            // button to share image
-            if (self.activityButtonEnabled) {
-                self.actionBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonItemTapped)];
-                [barButtons addObject:self.actionBarButtonItem];
-            }
-            
-            detailViewController.navigationItem.rightBarButtonItems = barButtons;
-            
-            // TODO zoom in/out (just like in Photos.app in the iPad)
-            [self presentViewController:navCtrl animated:YES completion:NULL];
             
             break;
         }
@@ -382,6 +386,29 @@ UIPopoverControllerDelegate, UIDocumentInteractionControllerDelegate>
         default: NSAssert(NO, @"Unknown content-type.");
     }
 }
+
+- (void)videoPlayerReady:(PBJVideoPlayerController *)videoPlayer
+{
+    [videoPlayer playFromBeginning];
+    NSLog(@"PTShowcaseViewController: PBJVideoPlayerController - videoPlayerReady");
+}
+
+- (void)videoPlayerPlaybackStateDidChange:(PBJVideoPlayerController *)videoPlayer
+{
+    NSLog(@"PTShowcaseViewController: PBJVideoPlayerController - )videoPlayerPlaybackStateDidChange");
+}
+
+-(void)videoPlayerPlaybackWillStartFromBeginning:(PBJVideoPlayerController *)videoPlayer
+{
+    NSLog(@"PTShowcaseViewController: PBJVideoPlayerController - videoPlayerPlaybackWillStartFromBeginning");
+}
+
+- (void)videoPlayerPlaybackDidEnd:(PBJVideoPlayerController *)videoPlayer
+{
+    NSLog(@"PTShowcaseViewController: PBJVideoPlayerController - videoPlayerPlaybackDidEnd");
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 
 #pragma mark - MWPhotoBrowserDelegate
 
