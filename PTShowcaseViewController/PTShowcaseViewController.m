@@ -490,7 +490,7 @@ UIPopoverControllerDelegate, UIDocumentInteractionControllerDelegate>
 
 - (UIViewController *)documentInteractionControllerViewControllerForPreview:(UIDocumentInteractionController *)controller
 {
-    return self;
+    return self.navigationController;
 }
 
 - (void)documentInteractionControllerWillBeginPreview:(__unused UIDocumentInteractionController *)controller
